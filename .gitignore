@@ -1,3 +1,4 @@
+.vscode
 .ctags*
 spwn/__pycache__
 spwn.egg-info
