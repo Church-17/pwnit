@@ -1,0 +1,18 @@
+- Configure the default behavior of spwn and other things from the configuration file
+- Auto detect files (binary, libc, loader), but i can indicate them also
+- Download loader from libc version (if missing)
+- Unstrip the libc with pwn.libcdb.unstrip_libc
+- Set binary and loader executable
+- Set runpath and interpreter for the debug binary
+- Interactively generate functions to interact with the binary
+- Generate a basic script from a template, with substitution of placeholders
+- Print basic info about the files:
+	- file
+	- checksec
+	- libc version
+	- potentially vulnerable functions
+	- cryptographic constants
+	- seccomp rules
+- Run cwe_checker
+- Launch decompiler
+- Launch custom user-provided commands
