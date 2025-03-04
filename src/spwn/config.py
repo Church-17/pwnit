@@ -13,6 +13,7 @@ DEFAULT_CONFIG = {
 	"analyze_cwe": False,
 	"download_libc_source": False,
 	"patch_basename": "{exe_basename}_patched",
+	"do_interactions": False,
 	"template_file": "~/.config/spwn/template.py",
 	"script_basename": "solve_{exe_basename}.py",
 	"pwntube_variable_name": "io",
@@ -32,7 +33,8 @@ class Config:
 		self.analyze_cwe: bool				= actual_config["analyze_cwe"]
 		self.download_libc_source			= actual_config["download_libc_source"]
 		self.patch_basename: str | None		= actual_config["patch_basename"]
-		self.template_file: str | None		= os.path.expanduser(actual_config["template_file"])
+		self.do_interactions: bool			= args.interactions or actual_config["do_interactions"]
+		self.template_file: str | None		= os.path.expanduser(args.template or actual_config["template_file"])
 		self.script_basename: str			= actual_config["script_basename"]
 		self.pwntube_variable_name: str		= actual_config["pwntube_variable_name"]
 		self.tab: str						= actual_config["tab"]
