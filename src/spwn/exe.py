@@ -2,6 +2,7 @@ from spwn.binary import Binary
 from spwn.loader import Loader
 from spwn.utils import run_command
 from pwn import log
+from pwnlib.term.text import red
 import yara
 import os
 import re
@@ -29,12 +30,12 @@ class Exe(Binary):
 		self._describe()
 
 
-	def dangerous_functions(self, check_functions: set[str]) -> None:
+	def dangerous_functions(self, check_functions: list[str]) -> None:
 		"""Print some darngerous functions used in the executable"""
 
-		found_functions = [f for f in check_functions if f in self.sym]
+		found_functions = [red(f) for f in check_functions if f in self.sym]
 		if found_functions:
-			log.success("There are some dangerous functions: " + ", ".join(found_functions))
+			log.success(f"There are some dangerous functions: {', '.join(found_functions)}")
 
 
 	def seccomp(self, timeout: float = 1) -> None:
