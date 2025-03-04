@@ -1,7 +1,7 @@
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.loader import Loader
-from spwn.utils import run_command, ask
+from spwn.utils import ask
 from pwn import options, log
 import os
 import shutil

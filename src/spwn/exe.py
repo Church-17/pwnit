@@ -61,7 +61,7 @@ class Exe(Binary):
 		rules = yara.compile(yara_rules)
 		matches = rules.match(self.path)
 		if matches:
-			log.success("yara found something:")
+			log.success("Yara found something:")
 			for match in matches:
 				addresses = [instance.offset for string_match in match.strings for instance in string_match.instances]
 				log.info(f'{match.rule} at {", ".join(map(hex, addresses))}')
@@ -71,22 +71,18 @@ class Exe(Binary):
 		"""Patch the executable with the given loader and runpath, produce a file with the given name in the runpath directory"""
 
 		# Enable some formatting in the name
-		output_basename = output_basename.format(basename=os.path.basename(self.path))
+		output_basename = output_basename.format(exe_basename=os.path.basename(self.path))
 
-		# Define patchelf args
+		# Run patchelf
 		new_debug_path = os.path.join(debug_dir, output_basename)
-		cmd_args = [
+		cmd_output = run_command([
 			"patchelf",
 			"--set-interpreter", os.path.join(".", os.path.relpath(loader.debug_path)),
 			"--set-rpath", os.path.join(".", os.path.relpath(debug_dir)),
 			"--output", new_debug_path,
 			self.path,
-		]
-		
-		# Run patchelf
-		cmd_output = run_command(cmd_args, progress=True)
+		], progress=True)
 
-		# Ensure output file
+		# Change exe debug path
 		if cmd_output is not None:
-			assert os.path.exists(new_debug_path)
 			self.debug_path = os.path.abspath(new_debug_path)

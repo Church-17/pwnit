@@ -7,10 +7,16 @@ CONFIG_FILENAME = "config.json"
 
 DEFAULT_CONFIG = {
 	"debug_dir": "debug_dir",
-	"solve_filename": "a.py",
-	"pwn_process": "r",
-	"tab": "\t",
+	"dangerous_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
+	"analyze_seccomp": True,
+	"yara_rules": "~/.config/spwn/findcrypt3.rules",
+	"analyze_cwe": False,
+	"download_libc_source": False,
+	"patch_basename": "{exe_basename}_patched",
 	"template_file": "~/.config/spwn/template.py",
+	"script_basename": "solve_{exe_basename}.py",
+	"pwntube_variable_name": "io",
+	"tab": "\t",
 }
 
 class Config:
@@ -19,10 +25,17 @@ class Config:
 		# Read (and create if necessary) the config
 		actual_config = self.read_config_file()
 
-		self.debug_dir = actual_config["debug_dir"]
-		self.template_file = actual_config["template_file"]
-		self.solve_filename = actual_config["solve_filename"]
-		self.tab = actual_config["tab"]
+		self.debug_dir: str					= actual_config["debug_dir"]
+		self.dangerous_functions: list[str] = actual_config["dangerous_functions"]
+		self.analyze_seccomp: bool			= actual_config["analyze_seccomp"]
+		self.yara_rules: str | None			= os.path.expanduser(actual_config["yara_rules"])
+		self.analyze_cwe: bool				= actual_config["analyze_cwe"]
+		self.download_libc_source			= actual_config["download_libc_source"]
+		self.patch_basename: str | None		= actual_config["patch_basename"]
+		self.template_file: str | None		= os.path.expanduser(actual_config["template_file"])
+		self.script_basename: str			= actual_config["script_basename"]
+		self.pwntube_variable_name: str		= actual_config["pwntube_variable_name"]
+		self.tab: str						= actual_config["tab"]
 
 
 	def read_config_file(self) -> dict[str]:

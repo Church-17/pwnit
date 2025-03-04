@@ -1,7 +1,6 @@
 from spwn.args import Args
 from spwn.config import Config
 from spwn.file_manage import recognize_binaries, create_debug_dir
-from pwn import log
 
 def main():
 
@@ -16,10 +15,10 @@ def main():
 	if exe:
 		# Analyze exe
 		exe.print_checksec()
-		exe.dangerous_functions(["system", "execve", "gets", "ptrace", "memfrob", "strfry"])
-		exe.seccomp()
-		# exe.yara()
-		exe.cwe()
+		exe.dangerous_functions(config.dangerous_functions)
+		if config.analyze_seccomp: exe.seccomp()
+		if config.yara_rules: exe.yara(config.yara_rules)
+		if config.analyze_cwe: exe.cwe()
 		print()
 
 	if libc:
@@ -32,15 +31,15 @@ def main():
 		config.debug_dir = create_debug_dir(config.debug_dir, libs_path, exe, libc, loader)
 
 		# Recover downloaded loader
-		if libs_path and not loader and exe:
+		if libs_path and (not loader) and exe:
 			_, _, loader = recognize_binaries(config.debug_dir, False, False, True)
 
 		# Download libc source
-		libc.download_source(config.debug_dir)
+		if config.download_libc_source: libc.download_source(config.debug_dir)
 
 		# Patch exe
-		if exe and loader:
-			exe.patch(loader, config.debug_dir, "{basename}_patched")
+		if config.patch_basename and exe and loader:
+			exe.patch(loader, config.debug_dir, config.patch_basename)
 
 	# Interactions
 	
