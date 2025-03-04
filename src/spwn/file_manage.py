@@ -21,53 +21,22 @@ def recognize_binaries(
 		exes = [file for file in all_files if Exe.check_filetype(file)]
 		if exes:
 			exe = Exe(exes[(options("Select executable:", exes) if len(exes) > 1 else 0)])
+			log.info(f"Exe: {exe.path}")
 			if exe.statically_linked:
+				log.warning("Exe statically linked")
 				return (exe, None, None)
 		
 	if search_libc:
 		libcs = [file for file in all_files if Libc.check_filetype(file)]
 		if libcs:
 			libc = Libc(libcs[(options("Select libc:", libcs) if len(libcs) > 1 else 0)])
+			log.info(f"Libc: {libc.path}")
 		
 	if search_loader:
 		loaders = [file for file in all_files if Loader.check_filetype(file)]
 		if loaders:
 			loader = Loader(loaders[(options("Select loader:", loaders) if len(loaders) > 1 else 0)])
-
-	return (exe, libc, loader)
-
-
-
-
-
-
-
-
-	# If there are not all of them, recognize them from file
-	if (exe_path is None) or (libc_path is None) or (loader_path is None):
-
-		# Get all possible exes, libcs and loaders
-		exes: list[str] = []
-		libcs: list[str] = []
-		loaders: list[str] = []
-		for file in os.listdir(dirpath):
-			file = os.path.join(dirpath, file)
-			if (exe_path is None) and Exe.check_filetype(file):
-				exes.append(file)
-			if (libc_path is None) and Libc.check_filetype(file):
-				libcs.append(file)
-			if (loader_path is None) and Loader.check_filetype(file):
-				loaders.append(file)
-
-		# Select binaries
-		if exes: exe_path = exes[(options("Select executable:", exes) if len(exes) > 1 else 0)]
-		if libcs: libc_path = libcs[(options("Select libc:", libcs) if len(libcs) > 1 else 0)]
-		if loaders: loader_path = loaders[(options("Select loader:", loaders) if len(loaders) > 1 else 0)]
-
-	# Create binaries objects
-	exe = Exe(exe_path) if exe_path else None
-	libc = Libc(libc_path) if libc_path else None
-	loader = Loader(loader_path) if loader_path else None
+			log.info(f"Loader: {loader.path}")
 
 	return (exe, libc, loader)
 

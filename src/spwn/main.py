@@ -1,9 +1,6 @@
 from spwn.args import Args
 from spwn.config import Config
 from spwn.file_manage import recognize_binaries, create_debug_dir
-from spwn.exe import Exe
-from spwn.libc import Libc
-from spwn.loader import Loader
 from pwn import log
 
 def main():
@@ -14,9 +11,6 @@ def main():
 
 	# Recognize binaries
 	exe, libc, loader = recognize_binaries(".")
-	if exe: log.info(f"Exe: {exe.path}")
-	if libc: log.info(f"Libc: {libc.path}")
-	if loader: log.info(f"Loader: {loader.path}")
 	print()
 
 	if exe:
