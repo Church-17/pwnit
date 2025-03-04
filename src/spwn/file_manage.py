@@ -6,6 +6,7 @@ from pwn import options, log
 import os
 import shutil
 
+
 def recognize_binaries(
 		dirpath: str,
 		search_exe: bool = True,
@@ -62,35 +63,44 @@ def create_debug_dir(
 	# Create debug dir
 	os.mkdir(debug_dir)
 
-	# If libs are been downloaded...
-	if libs_path:
+	if exe:
 
-		# Copy the libs requested by the exe from libs path to debug dir (if not exe, copy all of them)
-		libs_to_copy = set(os.listdir(libs_path))
-		if exe:
-			libs_to_copy = libs_to_copy & {os.path.basename(lib) for lib in exe.libs}
-		for lib in libs_to_copy:
-			shutil.copy2(os.path.join(libs_path, lib), debug_dir)
+		# If libs are been downloaded...
+		if libs_path:
 
-			# From the copied libs, identify libc and loader, and update their debug path
-			filepath = os.path.join(debug_dir, lib)
-			if libc and Libc.check_filetype(filepath):
-				libc.debug_path = filepath
-			elif loader and Loader.check_filetype(filepath):
-				loader.debug_path = filepath
+			# Copy the libs requested by the exe from libs path to debug dir (if not exe, copy all of them)
+			libs_to_copy = set(os.listdir(libs_path)) & {os.path.basename(lib) for lib in exe.libs}
+			for lib in libs_to_copy:
+				shutil.copy2(os.path.join(libs_path, lib), debug_dir)
 
-	# If download libs failed, fall back to the cwd
+				# From the copied libs, identify libc and loader, and update their debug path
+				filepath = os.path.join(debug_dir, lib)
+				if libc and Libc.check_filetype(filepath):
+					libc.debug_path = filepath
+				elif loader and Loader.check_filetype(filepath):
+					loader.debug_path = filepath
 
-	elif exe:
-		# Copy the libc and the loader from cwd, with the names requested by the exe
-		for lib in exe.libs:
-			filepath = os.path.join(debug_dir, lib)
-			if Libc.check_filetype(lib):
-				shutil.copy2(libc.path, filepath)
-				libc.debug_path = filepath
-			elif loader and Loader.check_filetype(lib):
-				shutil.copy2(loader.path, filepath)
-				loader.debug_path = filepath
+		# If download libs failed, fall back to the cwd
+		else:
+
+			# Copy the libc and the loader from cwd, with the names requested by the exe
+			for lib in exe.libs:
+				filepath = os.path.join(debug_dir, lib)
+				if libc and Libc.check_filetype(lib):
+					shutil.copy2(libc.path, filepath)
+					libc.debug_path = filepath
+				elif loader and Loader.check_filetype(lib):
+					shutil.copy2(loader.path, filepath)
+					loader.debug_path = filepath
+	
+	# If there isn't the exe, copy just the libs
+	else:
+		if libc:
+			shutil.copy2(libc.path, debug_dir)
+			libc.debug_path = os.path.join(debug_dir, os.path.basename(libc.path))
+		if loader:
+			shutil.copy2(loader.path, debug_dir)
+			loader.debug_path = os.path.join(debug_dir, os.path.basename(loader.path))
 
 	# Return the actual debug dir
 	return debug_dir

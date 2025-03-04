@@ -5,7 +5,6 @@ from spwn.utils import run_command
 
 class Binary(ELF):
 	def __init__(self, filepath: str):
-		assert self.check_filetype(filepath)
 		super().__init__(os.path.expanduser(filepath), checksec=False)
 		self.debug_path: str = self.path
 
