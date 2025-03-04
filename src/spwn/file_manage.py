@@ -2,18 +2,47 @@ from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.loader import Loader
 from spwn.utils import run_command, ask
-from pwn import options
+from pwn import options, log
 import os
 import shutil
 
 def recognize_binaries(
 		dirpath: str,
-		exe_path: str | None = None,
-		libc_path: str | None = None,
-		loader_path: str | None = None,
+		search_exe: bool = True,
+		search_libc: bool = True,
+		search_loader: bool = True,
 	) -> tuple[Exe | None, Libc | None, Loader | None]:
-	"""Recognize the executable, libc and loader from a directory. 'None' means to search for that element, an empty string to not search"""
+	"""Recognize the executable, libc and loader from a directory"""
 	
+	exe, libc, loader = None, None, None
+	all_files = [os.path.join(dirpath, file) for file in os.listdir(dirpath)]
+
+	if search_exe:
+		exes = [file for file in all_files if Exe.check_filetype(file)]
+		if exes:
+			exe = Exe(exes[(options("Select executable:", exes) if len(exes) > 1 else 0)])
+			if exe.statically_linked:
+				return (exe, None, None)
+		
+	if search_libc:
+		libcs = [file for file in all_files if Libc.check_filetype(file)]
+		if libcs:
+			libc = Libc(libcs[(options("Select libc:", libcs) if len(libcs) > 1 else 0)])
+		
+	if search_loader:
+		loaders = [file for file in all_files if Loader.check_filetype(file)]
+		if loaders:
+			loader = Loader(loaders[(options("Select loader:", loaders) if len(loaders) > 1 else 0)])
+
+	return (exe, libc, loader)
+
+
+
+
+
+
+
+
 	# If there are not all of them, recognize them from file
 	if (exe_path is None) or (libc_path is None) or (loader_path is None):
 

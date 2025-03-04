@@ -13,7 +13,7 @@ def main():
 	config = Config(args)
 
 	# Recognize binaries
-	exe, libc, loader = recognize_binaries(".", args.exe, args.libc, args.loader)
+	exe, libc, loader = recognize_binaries(".")
 	if exe: log.info(f"Exe: {exe.path}")
 	if libc: log.info(f"Libc: {libc.path}")
 	if loader: log.info(f"Loader: {loader.path}")
@@ -39,7 +39,7 @@ def main():
 
 		# Recover downloaded loader
 		if libs_path and not loader and exe:
-			_, _, loader = recognize_binaries(config.debug_dir, "", "", None)
+			_, _, loader = recognize_binaries(config.debug_dir, False, False, True)
 
 		# Download libc source
 		libc.download_source(config.debug_dir)
