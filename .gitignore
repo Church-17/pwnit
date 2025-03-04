@@ -1,6 +1,7 @@
 .vscode
 .ctags*
-spwn/__pycache__
-spwn.egg-info
+__pycache__
+egg-info
 build
 dist
+test

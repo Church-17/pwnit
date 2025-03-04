@@ -1,30 +1,24 @@
 # Spwn
 
-This repository started as a translation of
-[pwninit](https://github.com/io12/pwninit). It has been created because I
-love the utilities provided by pwninit, but I'm too lazy to learn Rust and
-I wanted to customize it, so I rewrote it in python (and added
-~~some~~ a lot more features).
+This repository started as a fork of [the original spwn](https://github.com/MarcoMeinardi/spwn). It was a good tools for initialize a PWN challenge, but I wanted more customization, and since it had not been maintained for a couple of years, I started to look into the code to give more freedom to the user. In the end, I ended up completely refactoring the code and adding some useful features.
 
 ## Features
- * Auto detect files (binary, libc, loader)
- * Download loader from libc version (if missing)
- * Unstrip the libc with `pwn.libcdb.unstrip_libc`
- * Set binary and loader executable
- * Set runpath and interpreter for the debug binary
- * Generate a basic script from a template
- * Interactively generate functions to interact with the binary
- * Print basic info about the files:
-   * `file`
-   * `checksec`
-   * libc version
-   * potentially vulnerable functions
-   * cryptographic constants
-   * seccomp rules
- * Launch decompiler
- * Run [cwe_checker](https://github.com/fkie-cad/cwe_checker)
- * Launch custom user-provided commands
- * Launch custom user-provided python scripts
+- Auto detect files (binary, libc, loader)
+- Print basic info about the files:
+  - `checksec`
+  - libc version
+  - potentially vulnerable functions
+  - cryptographic constants
+  - seccomp rules
+  - CWEs
+- Download and unstrip the libs and the loader related to the libc
+- Download the libc source code
+- Download loader from libc version (if missing)
+- Set binary and loader executable
+- Set runpath and interpreter for the debug binary
+- Interactively generate functions to interact with the binary
+- Generate a basic script from a template
+- Launch custom user-provided commands
 
 ## Usage
 ```

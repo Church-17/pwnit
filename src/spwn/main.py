@@ -1,48 +1,56 @@
-import argparse
+from spwn.args import Args
+from spwn.config import Config
+from spwn.file_manage import recognize_binaries, create_debug_dir
+from spwn.exe import Exe
+from spwn.libc import Libc
+from spwn.loader import Loader
+from pwn import log
 
 def main():
-	parser = argparse.ArgumentParser(
-		prog="spwn",
-		description="spwn is a tool to quickly start a pwn challenge, for more informations check https://github.com/MarcoMeinardi/spwn"
-	)
 
-	parser.add_argument(
-		"-i", "--inter",
-		action="store_true",
-		default=False,
-		help="Interactively create interaction functions"
-	)
+	# Parse args and config
+	args = Args()
+	config = Config(args)
 
-	parser.add_argument(
-		"-so", "--sonly",
-		action="store_true",
-		default=False,
-		help="Create the interaction script without analyzing the binary"
-	)
+	# Recognize binaries
+	exe, libc, loader = recognize_binaries(".", args.exe, args.libc, args.loader)
+	if exe: log.info(f"Exe: {exe.path}")
+	if libc: log.info(f"Libc: {libc.path}")
+	if loader: log.info(f"Loader: {loader.path}")
+	print()
 
-	parser.add_argument(
-		"-io", "--ionly",
-		action="store_true",
-		default=False,
-		help="Create the interaction functions, without doing any analysis"
-	)
+	if exe:
+		# Analyze exe
+		exe.print_checksec()
+		exe.dangerous_functions(["system", "execve", "gets", "ptrace", "memfrob", "strfry"])
+		exe.seccomp()
+		# exe.yara()
+		exe.cwe()
+		print()
 
-	parser.add_argument(
-		"-nd", "--nodecomp",
-		action="store_true",
-		default=False,
-		help="Don't open the decompiler"
-	)
+	if libc:
+		libc.print_version()
 
-	parser.add_argument(
-		"--config",
-		action="store_true",
-		default=False,
-		help="Setup configs and quit"
-	)
+		# Download requestes libs (loader included)
+		libs_path = libc.download_libs()
 
-	parser.add_argument(
-		"others",
-		nargs=argparse.REMAINDER,
-		help="You can avoid typing the hyphens and/or specify the template"
-	)
+		# Create debug dir and populate it from libs path or cwd
+		config.debug_dir = create_debug_dir(config.debug_dir, libs_path, exe, libc, loader)
+
+		# Recover downloaded loader
+		if libs_path and not loader and exe:
+			_, _, loader = recognize_binaries(config.debug_dir, "", "", None)
+
+		# Download libc source
+		libc.download_source(config.debug_dir)
+
+		# Patch exe
+		if exe and loader:
+			exe.patch(loader, config.debug_dir, "{basename}_patched")
+
+	# Interactions
+	
+
+	# Create script
+
+
