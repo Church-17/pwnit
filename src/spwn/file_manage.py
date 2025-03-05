@@ -1,7 +1,7 @@
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.loader import Loader
-from spwn.utils import ask
+from spwn.utils import ask, run_command
 from pwn import options, log
 import os
 import shutil
@@ -63,15 +63,27 @@ def create_debug_dir(
 	# Create debug dir
 	os.mkdir(debug_dir)
 
+	# Try to retrieve the requested libs by the exe
 	if exe:
+		try:
+			requested_libs = {os.path.basename(lib) for lib in exe.libs}
+			requested_libs.remove(os.path.basename(exe.path))
+		except:
+			ldd_output = run_command(["ldd", exe.path], timeout=1)
+			if ldd_output:
+				requested_libs = {os.path.basename(line.strip().split(" ", 1)[0]) for line in ldd_output.split("\n") if line and "linux-vdso" not in line}
+			else:
+				requested_libs = {}
 
+	if requested_libs:
 		# If libs are been downloaded...
 		if libs_path:
 
 			# Copy the libs requested by the exe from libs path to debug dir (if not exe, copy all of them)
-			libs_to_copy = set(os.listdir(libs_path)) & {os.path.basename(lib) for lib in exe.libs}
+			libs_to_copy = set(os.listdir(libs_path)) & requested_libs
 			for lib in libs_to_copy:
 				shutil.copy2(os.path.join(libs_path, lib), debug_dir)
+				requested_libs.remove(lib)
 
 				# From the copied libs, identify libc and loader, and update their debug path
 				filepath = os.path.join(debug_dir, lib)
@@ -80,20 +92,16 @@ def create_debug_dir(
 				elif loader and Loader.check_filetype(filepath):
 					loader.debug_path = filepath
 
-		# If download libs failed, fall back to the cwd
-		else:
-
-			# Copy the libc and the loader from cwd, with the names requested by the exe
-			for lib in exe.libs:
-				filepath = os.path.join(debug_dir, lib)
-				if libc and Libc.check_filetype(lib):
-					shutil.copy2(libc.path, filepath)
-					libc.debug_path = filepath
-				elif loader and Loader.check_filetype(lib):
-					shutil.copy2(loader.path, filepath)
-					loader.debug_path = filepath
+		# Copy the remained requested libs from cwd, with the names requested by the exe
+		for lib in requested_libs:
+			filepath = os.path.join(debug_dir, lib)
+			shutil.copy2(lib, filepath)
+			if libc and Libc.check_filetype(lib):
+				libc.debug_path = filepath
+			elif loader and Loader.check_filetype(lib):
+				loader.debug_path = filepath
 	
-	# If there isn't the exe, copy just the libs
+	# If failed to retrieve the requested libs, copy just libc and loader
 	else:
 		if libc:
 			shutil.copy2(libc.path, debug_dir)
