@@ -3,8 +3,8 @@ class Args:
 
 		args = self.parse_args()
 
+		self.only: bool			= args["only"]
 		self.remote: str		= args["remote"]
-		# self.only: bool			= args["only"]
 		self.interactions: bool	= args["interactions"]
 		self.template: str		= args["template"]
 		self.source: str		= args["source"]
@@ -17,14 +17,9 @@ class Args:
 			prog="spwn",
 			description="spwn is a tool to quickly start a pwn challenge",
 		)
-		# parser.add_argument(
-		# 	"-o", "--only",
-		# 	help="Do only the actions specified by the args",
-		# 	action="store_true",
-		# )
 		parser.add_argument(
-			"-i", "--interactions",
-			help="Do the interactions",
+			"-o", "--only",
+			help="Do only the actions specified via args",
 			action="store_true",
 		)
 		parser.add_argument(
@@ -32,12 +27,18 @@ class Args:
 			help="Specify the host:port",
 		)
 		parser.add_argument(
+			"-i", "--interactions",
+			help="Create the interactions",
+			action="store_true",
+		)
+		parser.add_argument(
 			"-t", "--template",
-			help="Specify the template",
+			help="Create the script from the template",
+			action="store_true",
 		)
 		parser.add_argument(
 			"-s", "--source",
-			help="Specify the template",
+			help="Donwload the libc source",
 			action="store_true",
 		)
 		return parser.parse_args().__dict__

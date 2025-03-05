@@ -7,13 +7,13 @@ CONFIG_FILENAME = "config.json"
 
 DEFAULT_CONFIG = {
 	"debug_dir": "debug",
-	"dangerous_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
-	"analyze_seccomp": True,
-	"yara_rules": "~/.config/spwn/findcrypt3.rules",
-	"analyze_cwe": False,
+	"check_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
+	"seccomp": True,
+	"yara": "~/.config/spwn/findcrypt3.rules",
+	"cwe": False,
 	"download_libc_source": False,
-	"patch_basename": "{exe_basename}_patched",
-	"do_interactions": False,
+	"patch": "{exe_basename}_patched",
+	"interactions": False,
 	"template_file": "~/.config/spwn/template.py",
 	"script_basename": "solve_{exe_basename}.py",
 	"pwntube_variable": "io",
@@ -26,18 +26,36 @@ class Config:
 		# Read (and create if necessary) the config
 		actual_config = self.read_config_file()
 
+		# Handle only mode
+		if args.only:
+			actual_config["check_functions"] = []
+			actual_config["seccomp"] = False
+			actual_config["yara"] = None
+			actual_config["cwe"] = False
+			actual_config["download_libc_source"] = False
+			actual_config["patch"] = None
+			actual_config["interactions"] = False
+			if not args.interactions: actual_config["template_file"] = None
+
+		# Set config variables
+		self.check_functions: list[str] 	= actual_config["check_functions"]
+		self.seccomp: bool					= actual_config["seccomp"]
+		self.yara: str | None				= actual_config["yara"]
+		self.cwe: bool						= actual_config["cwe"]
+		self.download_libc_source: bool		= args.source or actual_config["download_libc_source"]
+		self.patch: str | None				= actual_config["patch"]
+		self.interactions: bool				= args.interactions or actual_config["interactions"]
+		self.template_file: str | None		= actual_config["template_file"]
+
 		self.debug_dir: str					= actual_config["debug_dir"]
-		self.dangerous_functions: list[str] = actual_config["dangerous_functions"]
-		self.analyze_seccomp: bool			= actual_config["analyze_seccomp"]
-		self.yara_rules: str | None			= os.path.expanduser(actual_config["yara_rules"])
-		self.analyze_cwe: bool				= actual_config["analyze_cwe"]
-		self.download_libc_source			= args.source or actual_config["download_libc_source"]
-		self.patch_basename: str | None		= actual_config["patch_basename"]
-		self.do_interactions: bool			= args.interactions or actual_config["do_interactions"]
-		self.template_file: str | None		= os.path.expanduser(args.template or actual_config["template_file"])
 		self.script_basename: str			= actual_config["script_basename"]
 		self.pwntube_variable: str			= actual_config["pwntube_variable"]
 		self.tab: str						= actual_config["tab"]
+
+		# Handle tilde in paths
+		if self.template_file: self.template_file = os.path.expanduser(self.template_file)
+		if self.yara: self.yara = os.path.expanduser(self.yara)
+
 
 
 	def read_config_file(self) -> dict[str]:

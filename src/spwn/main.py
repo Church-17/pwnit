@@ -15,10 +15,10 @@ def main():
 	if exe:
 		# Analyze exe
 		exe.print_checksec()
-		if config.dangerous_functions: exe.dangerous_functions(config.dangerous_functions)
-		if config.analyze_seccomp: exe.seccomp()
-		if config.yara_rules: exe.yara(config.yara_rules)
-		if config.analyze_cwe: exe.cwe()
+		if config.check_functions: exe.check_functions(config.check_functions)
+		if config.seccomp: exe.seccomp()
+		if config.yara: exe.yara(config.yara)
+		if config.cwe: exe.cwe()
 		print()
 
 	if libc:
@@ -38,7 +38,7 @@ def main():
 		if config.download_libc_source: libc.download_source(debug_dir)
 
 		# Patch exe
-		if config.patch_basename and exe and loader: exe.patch(loader, debug_dir, config.patch_basename)
+		if config.patch and exe and loader: exe.patch(loader, debug_dir, config.patch)
 	
 	# Fix absent debug dir
 	else:

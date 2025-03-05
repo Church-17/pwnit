@@ -30,7 +30,7 @@ class Exe(Binary):
 		self._describe()
 
 
-	def dangerous_functions(self, check_functions: list[str]) -> None:
+	def check_functions(self, check_functions: list[str]) -> None:
 		"""Print some darngerous functions used in the executable"""
 
 		found_functions = [red(f) for f in check_functions if f in self.sym]
@@ -58,7 +58,7 @@ class Exe(Binary):
 			log.info(cmd_output)
 
 
-	def yara(self, yara_rules) -> None:
+	def yara(self, yara_rules: str) -> None:
 		rules = yara.compile(yara_rules)
 		matches = rules.match(self.path)
 		if matches:
