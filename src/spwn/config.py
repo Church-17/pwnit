@@ -11,7 +11,6 @@ DEFAULT_CONFIG = {
 	"pwntube_variable": "io",
 	"tab": "\t",
 	"check_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
-
 	"yara_rules": "~/.config/spwn/findcrypt3.rules",
 	"cwe": False,
 	"patch": "{exe_basename}_patched",
@@ -32,7 +31,6 @@ class Config:
 		self.pwntube_variable: str			= actual_config["pwntube_variable"]
 		self.tab: str						= actual_config["tab"]
 		self.check_functions: list[str] 	= actual_config["check_functions"]
-
 		self.yara_rules: str | None			= args.yara or actual_config["yara_rules"]
 		self.cwe: bool						= args.cwe or actual_config["cwe"]
 		self.patch: str | None				= args.patch or actual_config["patch"]
