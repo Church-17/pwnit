@@ -7,16 +7,17 @@ CONFIG_FILENAME = "config.json"
 
 DEFAULT_CONFIG = {
 	"debug_dir": "debug",
+	"script_basename": "solve_{exe_basename}.py",
+	"pwntube_variable": "io",
+	"tab": "\t",
 	"check_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
+
 	"yara_rules": "~/.config/spwn/findcrypt3.rules",
 	"cwe": False,
 	"patch": "{exe_basename}_patched",
 	"download_libc_source": False,
 	"interactions": False,
 	"template_file": "~/.config/spwn/template.py",
-	"script_basename": "solve_{exe_basename}.py",
-	"pwntube_variable": "io",
-	"tab": "\t",
 }
 
 class Config:
