@@ -31,7 +31,7 @@ class Config:
 		self.analyze_seccomp: bool			= actual_config["analyze_seccomp"]
 		self.yara_rules: str | None			= os.path.expanduser(actual_config["yara_rules"])
 		self.analyze_cwe: bool				= actual_config["analyze_cwe"]
-		self.download_libc_source			= actual_config["download_libc_source"]
+		self.download_libc_source			= args.source or actual_config["download_libc_source"]
 		self.patch_basename: str | None		= actual_config["patch_basename"]
 		self.do_interactions: bool			= args.interactions or actual_config["do_interactions"]
 		self.template_file: str | None		= os.path.expanduser(args.template or actual_config["template_file"])

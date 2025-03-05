@@ -7,6 +7,7 @@ class Args:
 		# self.only: bool			= args["only"]
 		self.interactions: bool	= args["interactions"]
 		self.template: str		= args["template"]
+		self.source: str		= args["source"]
 
 	def parse_args(self) -> dict[str]:
 		"""Parse the arguments given to the command into a dict"""
@@ -33,5 +34,10 @@ class Args:
 		parser.add_argument(
 			"-t", "--template",
 			help="Specify the template",
+		)
+		parser.add_argument(
+			"-s", "--source",
+			help="Specify the template",
+			action="store_true",
 		)
 		return parser.parse_args().__dict__
