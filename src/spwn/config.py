@@ -8,11 +8,10 @@ CONFIG_FILENAME = "config.json"
 DEFAULT_CONFIG = {
 	"debug_dir": "debug",
 	"check_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
-	"seccomp": True,
-	"yara": "~/.config/spwn/findcrypt3.rules",
+	"yara_rules": "~/.config/spwn/findcrypt3.rules",
 	"cwe": False,
-	"download_libc_source": False,
 	"patch": "{exe_basename}_patched",
+	"download_libc_source": False,
 	"interactions": False,
 	"template_file": "~/.config/spwn/template.py",
 	"script_basename": "solve_{exe_basename}.py",
@@ -26,36 +25,32 @@ class Config:
 		# Read (and create if necessary) the config
 		actual_config = self.read_config_file()
 
-		# Handle only mode
-		if args.only:
-			actual_config["check_functions"] = []
-			actual_config["seccomp"] = False
-			actual_config["yara"] = None
-			actual_config["cwe"] = False
-			actual_config["download_libc_source"] = False
-			actual_config["patch"] = None
-			actual_config["interactions"] = False
-			if not args.interactions: actual_config["template_file"] = None
-
-		# Set config variables
-		self.check_functions: list[str] 	= actual_config["check_functions"]
-		self.seccomp: bool					= actual_config["seccomp"]
-		self.yara: str | None				= actual_config["yara"]
-		self.cwe: bool						= actual_config["cwe"]
-		self.download_libc_source: bool		= args.source or actual_config["download_libc_source"]
-		self.patch: str | None				= actual_config["patch"]
-		self.interactions: bool				= args.interactions or actual_config["interactions"]
-		self.template_file: str | None		= actual_config["template_file"]
-
+		# Set config variables 
 		self.debug_dir: str					= actual_config["debug_dir"]
 		self.script_basename: str			= actual_config["script_basename"]
 		self.pwntube_variable: str			= actual_config["pwntube_variable"]
 		self.tab: str						= actual_config["tab"]
+		self.check_functions: list[str] 	= actual_config["check_functions"]
+
+		self.yara_rules: str | None			= args.yara or actual_config["yara_rules"]
+		self.cwe: bool						= args.cwe or actual_config["cwe"]
+		self.patch: str | None				= args.patch or actual_config["patch"]
+		self.download_libc_source: bool		= args.source or actual_config["download_libc_source"]
+		self.interactions: bool				= args.interactions or actual_config["interactions"]
+		self.template_file: str | None		= args.template or actual_config["template_file"]
 
 		# Handle tilde in paths
 		if self.template_file: self.template_file = os.path.expanduser(self.template_file)
-		if self.yara: self.yara = os.path.expanduser(self.yara)
+		if self.yara_rules: self.yara_rules = os.path.expanduser(self.yara_rules)
 
+		# Handle only mode
+		if args.only:
+			if not args.yara: self.yara_rules = None
+			if not args.cwe: self.cwe = False
+			if not args.patch: self.patch = None
+			if not args.source: self.download_libc_source = False
+			if not args.interactions: self.interactions = False
+			if not args.interactions or not args.template: self.template_file = None
 
 
 	def read_config_file(self) -> dict[str]:

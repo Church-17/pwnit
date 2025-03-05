@@ -15,9 +15,9 @@ def main():
 	if exe:
 		# Analyze exe
 		exe.print_checksec()
-		if config.check_functions: exe.check_functions(config.check_functions)
-		if config.seccomp: exe.seccomp()
-		if config.yara: exe.yara(config.yara)
+		exe.check_functions(config.check_functions)
+		exe.seccomp()
+		if config.yara_rules: exe.yara(config.yara_rules)
 		if config.cwe: exe.cwe()
 		print()
 
@@ -34,11 +34,11 @@ def main():
 		if libs_path and (not loader) and exe:
 			_, _, loader = recognize_binaries(debug_dir, False, False, True)
 
-		# Download libc source
-		if config.download_libc_source: libc.download_source(debug_dir)
-
 		# Patch exe
 		if config.patch and exe and loader: exe.patch(loader, debug_dir, config.patch)
+
+		# Download libc source
+		if config.download_libc_source: libc.download_source(debug_dir)
 	
 	# Fix absent debug dir
 	else:
