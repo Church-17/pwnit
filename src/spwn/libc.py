@@ -71,7 +71,8 @@ class Libc(Binary):
 			waiting.status(f"Downloading from {url}...")
 			try:
 				response = requests.get(url)
-			except:
+			except (requests.ConnectionError, requests.ConnectTimeout) as err:
+				log.debug(err)
 				response = None
 			if not response:
 				waiting.failure("Download failed")
