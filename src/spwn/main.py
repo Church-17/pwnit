@@ -15,7 +15,7 @@ def main():
 	if exe:
 		# Analyze exe
 		exe.print_checksec()
-		exe.dangerous_functions(config.dangerous_functions)
+		if config.dangerous_functions: exe.dangerous_functions(config.dangerous_functions)
 		if config.analyze_seccomp: exe.seccomp()
 		if config.yara_rules: exe.yara(config.yara_rules)
 		if config.analyze_cwe: exe.cwe()
@@ -28,18 +28,21 @@ def main():
 		libs_path = libc.download_libs()
 
 		# Create debug dir and populate it from libs path or cwd
-		config.debug_dir = create_debug_dir(config.debug_dir, libs_path, exe, libc, loader)
+		debug_dir = create_debug_dir(config.debug_dir, libs_path, exe, libc, loader)
 
 		# Recover downloaded loader
 		if libs_path and (not loader) and exe:
-			_, _, loader = recognize_binaries(config.debug_dir, False, False, True)
+			_, _, loader = recognize_binaries(debug_dir, False, False, True)
 
 		# Download libc source
-		if config.download_libc_source: libc.download_source(config.debug_dir)
+		if config.download_libc_source: libc.download_source(debug_dir)
 
 		# Patch exe
-		if config.patch_basename and exe and loader:
-			exe.patch(loader, config.debug_dir, config.patch_basename)
+		if config.patch_basename and exe and loader: exe.patch(loader, debug_dir, config.patch_basename)
+	
+	# Fix absent debug dir
+	else:
+		debug_dir = "."
 
 	# Interactions
 	
