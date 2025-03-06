@@ -45,7 +45,7 @@ class Exe(Binary):
 		if ("prctl" in self.sym) or any(True for function in self.sym if function.startswith("seccomp")):
 
 			# Run command
-			cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.path}\' </dev/null >&0 2>&0"], progress=True, timeout=timeout)
+			cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.debug_path}\' </dev/null >&0 2>&0"], progress=True, timeout=timeout)
 			if cmd_output:
 				log.info(cmd_output)
 
