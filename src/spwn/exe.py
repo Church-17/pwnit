@@ -12,6 +12,7 @@ class Exe(Binary):
 	def __init__(self, filepath: str) -> None:
 		super().__init__(filepath)
 
+
 	@classmethod
 	def check_filetype(cls, filepath: str) -> bool:
 		"""Check if a file is an executable"""
