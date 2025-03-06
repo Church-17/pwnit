@@ -64,6 +64,7 @@ def create_debug_dir(
 	os.mkdir(debug_dir)
 
 	# Try to retrieve the requested libs by the exe
+	requested_libs = {}
 	if exe:
 		try:
 			requested_libs = {os.path.basename(lib) for lib in exe.libs}
@@ -71,9 +72,7 @@ def create_debug_dir(
 		except:
 			ldd_output = run_command(["ldd", exe.path], timeout=1)
 			if ldd_output:
-				requested_libs = {os.path.basename(line.strip().split(" ", 1)[0]) for line in ldd_output.split("\n") if line and "linux-vdso" not in line}
-			else:
-				requested_libs = {}
+				requested_libs = {os.path.basename(line.strip().split(" ", 1)[0]) for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
 
 	if requested_libs:
 		# If libs are been downloaded...
@@ -94,12 +93,18 @@ def create_debug_dir(
 
 		# Copy the remained requested libs from cwd, with the names requested by the exe
 		for lib in requested_libs:
-			filepath = os.path.join(debug_dir, lib)
-			shutil.copy2(lib, filepath)
-			if libc and Libc.check_filetype(lib):
-				libc.debug_path = filepath
-			elif loader and Loader.check_filetype(lib):
-				loader.debug_path = filepath
+			if os.path.isfile(lib):
+				filepath = os.path.join(debug_dir, lib)
+				requested_libs.remove(lib)
+				shutil.copy2(lib, filepath)
+				if libc and Libc.check_filetype(lib):
+					libc.debug_path = filepath
+				elif loader and Loader.check_filetype(lib):
+					loader.debug_path = filepath
+
+		# Check if all requested libs are been found
+		if requested_libs:
+			log.warning(f"Dependencies not found: {', '.join(requested_libs)}")
 	
 	# If failed to retrieve the requested libs, copy just libc and loader
 	else:

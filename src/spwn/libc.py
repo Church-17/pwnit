@@ -47,7 +47,7 @@ class Libc(Binary):
 			with context.silent:
 				libs_path = libcdb.download_libraries(self.path)
 			if libs_path:
-				waiting.success()
+				waiting.success(f"Done ({libs_path})")
 			else:
 				waiting.failure()
 
