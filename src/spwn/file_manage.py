@@ -75,9 +75,9 @@ def create_debug_dir(
 				requested_libs = {os.path.basename(line.strip().split(" ", 1)[0]) for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
 
 	if requested_libs:
+
 		# If libs are been downloaded...
 		if libs_path:
-
 			# Copy the libs requested by the exe from libs path to debug dir (if not exe, copy all of them)
 			libs_to_copy = set(os.listdir(libs_path)) & requested_libs
 			for lib in libs_to_copy:
