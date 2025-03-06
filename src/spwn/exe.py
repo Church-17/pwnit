@@ -72,7 +72,7 @@ class Exe(Binary):
 		"""Patch the executable with the given loader and runpath, produce a file with the given name in the runpath directory"""
 
 		# Enable some formatting in the name
-		output_basename = output_basename.format(exe_basename=os.path.basename(self.path))
+		output_basename = output_basename.replace("<exe_basename>", os.path.basename(self.path))
 
 		# Run patchelf
 		new_debug_path = os.path.join(debug_dir, output_basename)
