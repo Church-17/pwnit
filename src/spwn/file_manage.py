@@ -92,7 +92,7 @@ def create_debug_dir(
 					loader.debug_path = filepath
 
 		# Copy the remained requested libs from cwd, with the names requested by the exe
-		for lib in requested_libs:
+		for lib in requested_libs.copy():
 			if os.path.isfile(lib):
 				filepath = os.path.join(debug_dir, lib)
 				requested_libs.remove(lib)
