@@ -53,7 +53,7 @@ def create_debug_dir(
 
 	# Check if debug dir exists, in case ask for a new name
 	while os.path.exists(debug_dir):
-		new_name = ask(f"{debug_dir} already exists: type another name or leave empty to overwrite")
+		new_name = ask(f"{debug_dir} already exists: type another name (empty to overwrite)")
 		if new_name:
 			debug_dir = new_name
 		else:

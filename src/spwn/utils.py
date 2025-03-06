@@ -36,5 +36,4 @@ def run_command(args: list[str], progress: bool = False, **kwargs) -> str | None
 
 
 def ask(prompt: str) -> str:
-	log.warning(prompt)
-	return input(f" [?] > ")
+	return input(f" [?] {prompt} > ")
