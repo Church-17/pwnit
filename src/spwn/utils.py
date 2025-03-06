@@ -36,7 +36,7 @@ def run_command(args: list[str], progress: bool = False, **kwargs) -> str | None
 
 
 def ask(prompt: str, can_skip: bool = True) -> str:
-	print(f" [?] {prompt} > ", end="")
 	while True:
-		received = input()
+		received = input(f" [?] {prompt} > ")
 		if received or can_skip: return received
+		log.warning("Can't skip")
