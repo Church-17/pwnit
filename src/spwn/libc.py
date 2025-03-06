@@ -9,7 +9,7 @@ import tarfile
 class Libc(Binary):
 	def __init__(self, name: str):
 		super().__init__(name)
-		self.libc_version = self.get_libc_version()
+		self.libc_version, self.libc_id = self.get_libc_version()
 
 
 	@classmethod
@@ -20,24 +20,32 @@ class Libc(Binary):
 		return False
 
 
-	def get_libc_version(self) -> str | None:
+	def get_libc_version(self) -> tuple[str | None, str | None]:
+		"""Retrieve libc version and id"""
+
+		# Retrieve libc version
+		with open(self.path, "br") as libc_file:
+			libc_content = libc_file.read()
+		match = re.search(br"release version (\d+(?:\.\d+)+)", libc_content)
+		libc_version = match.group(1).decode() if match else None
+
+		# Retrieve libc id
 		try:
 			libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
-			return libc_matches[0]['id']
+			libc_id = libc_matches[0]['id']
 		except:
-			with open(self.path, "br") as libc_file:
-				libc_content = libc_file.read()
-			match = re.search(br"release version (\d+(?:\.\d+)+)", libc_content)
-			if match:
-				return match.group(1).decode()
-		return None
+			libc_id = None
+
+		return libc_version, libc_id
 
 
 	def print_version(self) -> None:
 		"""Print the version string or raise a warning"""
 
 		if self.libc_version:
-			log.info(f"Libc version: {self.libc_version}")
+			log.info(f"Libc version: {self.libc_version}" + (f" ({self.libc_id})" if self.libc_id else ""))
+		else:
+			log.failure("Impossible to retrieve libc version")
 
 
 	def download_libs(self) -> str | None:
@@ -61,13 +69,9 @@ class Libc(Binary):
 			if not self.libc_version:
 				waiting.failure("Libc version absent")
 				return
-			match = re.search(r"\d+(?:\.\d+)+", self.libc_version)
-			if not match:
-				waiting.failure("Libc version absent")
-				return
 
 			# Get libc source archive
-			url = f"http://ftpmirror.gnu.org/gnu/libc/glibc-{match.group()}.tar.gz"
+			url = f"http://ftpmirror.gnu.org/gnu/libc/glibc-{self.libc_version}.tar.gz"
 			waiting.status(f"Downloading from {url}...")
 			try:
 				response = requests.get(url)
