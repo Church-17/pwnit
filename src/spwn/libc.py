@@ -14,7 +14,7 @@ class Libc(Binary):
 
 	@classmethod
 	def check_filetype(cls, filepath: str) -> bool:
-		match = re.search(r"^libc([^A-Za-z].*)?\.so.*", os.path.basename(filepath))
+		match = re.search(r"^libc([^A-Za-z].*)?\.so", os.path.basename(filepath))
 		if match:
 			return True
 		return False
