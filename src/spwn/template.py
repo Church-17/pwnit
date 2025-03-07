@@ -55,32 +55,31 @@ class Template:
 		if not self.template_content:
 			return
 
+		host, port = remote.split(":", 1) if remote and ":" in remote else (None, None)
 		# Replace placeholders
+		replacements = {
+			DEBUG_DIR: debug_dir,
+			REMOTE: remote or "REMOTE",
+			HOST: host or "HOST",
+			PORT: port or "PORT",
+			EXE_BASENAME: os.path.basename(exe.path) if exe else "EXE_BASENAME",
+			EXE_RELPATH: os.path.join(".", os.path.relpath(exe.path)) if exe else "EXE_RELPATH",
+			EXE_ABSPATH: os.path.abspath(exe.path) if exe else "EXE_ABSPATH",
+			EXE_DEBUG_BASENAME: os.path.basename(exe.debug_path) if exe else "EXE_DEBUG_BASENAME",
+			EXE_DEBUG_RELPATH: os.path.join(".", os.path.relpath(exe.debug_path)) if exe else "EXE_DEBUG_RELPATH",
+			EXE_DEBUG_ABSPATH: os.path.abspath(exe.debug_path) if exe else "EXE_DEBUG_ABSPATH",
+			LIBC_BASENAME: os.path.basename(libc.path) if libc else "LIBC_BASENAME",
+			LIBC_RELPATH: os.path.join(".", os.path.relpath(libc.path)) if libc else "LIBC_RELPATH",
+			LIBC_ABSPATH: os.path.abspath(libc.path) if libc else "LIBC_ABSPATH",
+			LIBC_DEBUG_BASENAME: os.path.basename(libc.debug_path) if libc else "LIBC_DEBUG_BASENAME",
+			LIBC_DEBUG_RELPATH: os.path.join(".", os.path.relpath(libc.debug_path)) if libc else "LIBC_DEBUG_RELPATH",
+			LIBC_DEBUG_ABSPATH: os.path.abspath(libc.debug_path) if libc else "LIBC_DEBUG_ABSPATH",
+			INTERACTIONS: interactions.dump(self.tab_interactions_placeholder) if interactions else "",
+		}
+
 		new_content = self.template_content
-		new_content = new_content.replace(DEBUG_DIR, debug_dir)
-		if remote:
-			new_content = new_content.replace(REMOTE, remote)
-			if ":" in remote:
-				host, port = remote.split(":", 1)
-				new_content = new_content.replace(HOST, host)
-				new_content = new_content.replace(PORT, port)
-			else:
-				new_content = new_content.replace(HOST, remote)
-		if exe:
-			new_content = new_content.replace(EXE_BASENAME, os.path.basename(exe.path))
-			new_content = new_content.replace(EXE_RELPATH, os.path.join(".", os.path.relpath(exe.path)))
-			new_content = new_content.replace(EXE_ABSPATH, os.path.abspath(exe.path))
-			new_content = new_content.replace(EXE_DEBUG_BASENAME, os.path.basename(exe.debug_path))
-			new_content = new_content.replace(EXE_DEBUG_RELPATH, os.path.join(".", os.path.relpath(exe.debug_path)))
-			new_content = new_content.replace(EXE_DEBUG_ABSPATH, os.path.abspath(exe.debug_path))
-		if libc:
-			new_content = new_content.replace(LIBC_BASENAME, os.path.basename(libc.path))
-			new_content = new_content.replace(LIBC_RELPATH, os.path.join(".", os.path.relpath(libc.path)))
-			new_content = new_content.replace(LIBC_ABSPATH, os.path.abspath(libc.path))
-			new_content = new_content.replace(LIBC_DEBUG_BASENAME, os.path.basename(libc.debug_path))
-			new_content = new_content.replace(LIBC_DEBUG_RELPATH, os.path.join(".", os.path.relpath(libc.debug_path)))
-			new_content = new_content.replace(LIBC_DEBUG_ABSPATH, os.path.abspath(libc.debug_path))
-		new_content = new_content.replace(INTERACTIONS, interactions.dump(self.tab_interactions_placeholder) if interactions else "")
+		for placeholder, replacement in replacements.items():
+			new_content = new_content.replace(placeholder, replacement)
 
 		# Write new script
 		script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
