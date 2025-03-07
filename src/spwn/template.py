@@ -1,6 +1,8 @@
 import re
 import os
+import shutil
 from pwn import log
+from spwn.utils import ask
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions
@@ -81,8 +83,18 @@ class Template:
 		for placeholder, replacement in replacements.items():
 			new_content = new_content.replace(placeholder, replacement)
 
-		# Write new script
+		# Handle placeholders in script basename
 		script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
+
+		# Check if script exists, in case ask for a new name
+		while os.path.exists(script):
+			new_name = ask(f"{script} already exists: type another name (empty to overwrite)")
+			if new_name:
+				script = new_name
+			else:
+				shutil.rmtree(script)
+				break
+
 		with open(script, "w") as script_file:
 			script_file.write(new_content)
 		log.success(f"Script \'{script}\' created")
