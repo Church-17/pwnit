@@ -1,10 +1,10 @@
+import os
+import shutil
+from pwn import options, log
+from spwn.utils import ask
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.loader import Loader
-from spwn.utils import ask, run_command
-from pwn import options, log
-import os
-import shutil
 
 
 def recognize_binaries(

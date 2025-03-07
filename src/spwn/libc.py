@@ -1,9 +1,9 @@
+import re
+import os
+import tarfile
+import requests
 from pwn import log, libcdb, context
 from spwn.binary import Binary
-import os
-import re
-import requests
-import tarfile
 
 
 class Libc(Binary):

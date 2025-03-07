@@ -1,5 +1,5 @@
-from pwn import ELF
 import os
+from pwn import ELF
 
 class Binary(ELF):
 	def __init__(self, filepath: str) -> None:

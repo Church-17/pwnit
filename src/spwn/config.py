@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from spwn.args import Args
 
 CONFIG_DIR_PATH = os.path.expanduser("./config_dir")

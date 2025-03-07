@@ -1,6 +1,6 @@
-from pwn import log
 import re
 import os
+from pwn import log
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions

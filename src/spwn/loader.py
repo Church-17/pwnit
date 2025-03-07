@@ -1,6 +1,6 @@
-from spwn.binary import Binary
-import os
 import re
+import os
+from spwn.binary import Binary
 
 class Loader(Binary):
 	def __init__(self, name: str):
