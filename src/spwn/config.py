@@ -1,6 +1,7 @@
 import os
 import json
 from spwn.args import Args
+from pwn import log
 
 CONFIG_DIR_PATH = os.path.expanduser("./config_dir")
 CONFIG_FILENAME = "config.json"
@@ -38,10 +39,6 @@ class Config:
 		self.interactions: bool				= args.interactions or actual_config["interactions"]
 		self.template_file: str | None		= args.template or actual_config["template_file"]
 
-		# Handle tilde in paths
-		if self.template_file: self.template_file = os.path.expanduser(self.template_file)
-		if self.yara_rules: self.yara_rules = os.path.expanduser(self.yara_rules)
-
 		# Handle only mode
 		if args.only:
 			if not args.yara: self.yara_rules = None
@@ -50,6 +47,18 @@ class Config:
 			if not args.source: self.download_libc_source = False
 			if not args.interactions: self.interactions = False
 			if not args.interactions or not args.template: self.template_file = None
+
+		# Handle specific config
+		if self.yara_rules:
+			self.yara_rules = os.path.expanduser(self.yara_rules)
+			if not os.path.isfile(self.yara_rules):
+				self.yara_rules = None
+				log.failure("Yara rules file doesn't exists. It will not be analyzed with yara")
+		if self.template_file:
+			self.template_file = os.path.expanduser(self.template_file)
+			if not os.path.isfile(self.template_file):
+				self.template_file = None
+				log.failure("Template file doesn't exists. A new script will not be created")
 
 
 	def read_config_file(self) -> dict[str]:
