@@ -1,6 +1,8 @@
 from spwn.args import Args
 from spwn.config import Config
 from spwn.file_manage import recognize_binaries, create_debug_dir
+from spwn.interactions import Interactions
+from spwn.template import Template
 
 def main():
 
@@ -53,9 +55,15 @@ def main():
 		if config.cwe: exe.cwe()
 		print()
 
-	# Interactions
-	
+	if config.template_file:
 
-	# Create script
+		# Interactions
+		if config.interactions:
+			interactions = Interactions(config.pwntube_variable, config.tab)
+		else:
+			interactions = None
 
+		# Create script
+		template = Template(config.template_file)
+		template.create_script(config.script_basename, debug_dir, args.remote, exe, libc, interactions)
 
