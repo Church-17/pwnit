@@ -2,7 +2,7 @@ import json
 import os
 from spwn.args import Args
 
-CONFIG_DIR_PATH = os.path.expanduser("./config_dir")
+CONFIG_DIR_PATH = os.path.expanduser("~/.config/spwn")
 CONFIG_FILENAME = "config.json"
 
 DEFAULT_CONFIG = {
