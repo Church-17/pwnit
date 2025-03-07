@@ -53,8 +53,9 @@ class Template:
 		) -> None:
 
 		if not self.template_content:
-			return None
+			return
 
+		# Replace placeholders
 		new_content = self.template_content
 		new_content = new_content.replace(DEBUG_DIR, debug_dir)
 		if remote:
@@ -65,7 +66,6 @@ class Template:
 				new_content = new_content.replace(PORT, port)
 			else:
 				new_content = new_content.replace(HOST, remote)
-
 		if exe:
 			new_content = new_content.replace(EXE_BASENAME, os.path.basename(exe.path))
 			new_content = new_content.replace(EXE_RELPATH, os.path.join(".", os.path.relpath(exe.path)))
@@ -80,11 +80,10 @@ class Template:
 			new_content = new_content.replace(LIBC_DEBUG_BASENAME, os.path.basename(libc.debug_path))
 			new_content = new_content.replace(LIBC_DEBUG_RELPATH, os.path.join(".", os.path.relpath(libc.debug_path)))
 			new_content = new_content.replace(LIBC_DEBUG_ABSPATH, os.path.abspath(libc.debug_path))
-		if interactions:
-			new_content = new_content.replace(INTERACTIONS, interactions.dump(self.tab_interactions_placeholder))
+		new_content = new_content.replace(INTERACTIONS, interactions.dump(self.tab_interactions_placeholder) if interactions else "")
 
+		# Write new script
 		script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
 		with open(script, "w") as script_file:
 			script_file.write(new_content)
-
-		log.success("Script \'{script}\' created")
+		log.success(f"Script \'{script}\' created")
