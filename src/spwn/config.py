@@ -16,8 +16,8 @@ DEFAULT_CONFIG = {
 	"cwe": False,
 	"patch": "<exe_basename>_patched",
 	"download_libc_source": False,
-	"interactions": False,
 	"template_file": "~/.config/spwn/template.py",
+	"interactions": False,
 }
 
 class Config:
@@ -36,8 +36,8 @@ class Config:
 		self.cwe: bool						= args.cwe or actual_config["cwe"]
 		self.patch: str | None				= args.patch or actual_config["patch"]
 		self.download_libc_source: bool		= args.source or actual_config["download_libc_source"]
-		self.interactions: bool				= args.interactions or actual_config["interactions"]
 		self.template_file: str | None		= args.template or actual_config["template_file"]
+		self.interactions: bool				= args.interactions or actual_config["interactions"]
 
 		# Handle only mode
 		if args.only:
@@ -45,8 +45,8 @@ class Config:
 			if not args.cwe: self.cwe = False
 			if not args.patch: self.patch = None
 			if not args.source: self.download_libc_source = False
+			if not args.interactions and not args.template: self.template_file = None
 			if not args.interactions: self.interactions = False
-			if not args.interactions or not args.template: self.template_file = None
 
 		# Handle specific config
 		if self.yara_rules:
