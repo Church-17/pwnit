@@ -12,6 +12,16 @@ class Exe(Binary):
 	def __init__(self, filepath: str) -> None:
 		super().__init__(filepath)
 
+		# Retrieve required libs
+		self.required_libs = set()
+		try:
+			self.required_libs = {os.path.basename(lib) for lib in self.libs}
+			self.required_libs.remove(os.path.basename(self.path))
+		except:
+			ldd_output = run_command(["ldd", self.path], timeout=1)
+			if ldd_output:
+				self.required_libs = {os.path.basename(line.strip().split(" ", 1)[0]) for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
+
 
 	@classmethod
 	def check_filetype(cls, filepath: str) -> bool:
