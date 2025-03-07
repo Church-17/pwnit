@@ -83,6 +83,7 @@ class Template:
 		if interactions:
 			new_content = new_content.replace(INTERACTIONS, interactions.dump(self.tab_interactions_placeholder))
 
+		script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
 		with open(script, "w") as script_file:
 			script_file.write(new_content)
 

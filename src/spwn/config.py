@@ -1,7 +1,6 @@
 import os
 import json
 from spwn.args import Args
-from pwn import log
 
 CONFIG_DIR_PATH = os.path.expanduser("./config_dir")
 CONFIG_FILENAME = "config.json"
