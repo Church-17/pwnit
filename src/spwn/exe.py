@@ -3,7 +3,6 @@ from spwn.loader import Loader
 from spwn.utils import run_command
 from pwn import log
 from pwnlib.term.text import red
-import yara
 import os
 import re
 
@@ -70,6 +69,12 @@ class Exe(Binary):
 
 
 	def yara(self, yara_rules: str) -> None:
+		
+		if not os.path.isfile(yara_rules):
+			log.failure("Yara rules file doesn't exists. The exe will not be analyzed with yara")
+			return
+
+		import yara
 		rules = yara.compile(yara_rules)
 		matches = rules.match(self.path)
 		if matches:

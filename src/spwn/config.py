@@ -49,16 +49,8 @@ class Config:
 			if not args.interactions: self.interactions = False
 
 		# Handle specific config
-		if self.yara_rules:
-			self.yara_rules = os.path.expanduser(self.yara_rules)
-			if not os.path.isfile(self.yara_rules):
-				self.yara_rules = None
-				log.failure("Yara rules file doesn't exists. It will not be analyzed with yara")
-		if self.template_file:
-			self.template_file = os.path.expanduser(self.template_file)
-			if not os.path.isfile(self.template_file):
-				self.template_file = None
-				log.failure("Template file doesn't exists. A new script will not be created")
+		if self.yara_rules: self.yara_rules = os.path.expanduser(self.yara_rules)
+		if self.template_file: self.template_file = os.path.expanduser(self.template_file)
 
 
 	def read_config_file(self) -> dict[str]:
