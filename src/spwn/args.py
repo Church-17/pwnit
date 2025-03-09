@@ -7,10 +7,10 @@ class Args:
 		self.interactions: bool		= args["interactions"]
 		self.template: str | None	= args["template"]
 		self.only: bool				= args["only"]
+		self.source: bool			= args["source"]
+		self.patch: str | None		= args["patch"]
 		self.yara: str | None		= args["yara"]
 		self.cwe: bool				= args["cwe"]
-		self.patch: str | None		= args["patch"]
-		self.source: str | None		= args["source"]
 
 	def parse_args(self) -> dict[str]:
 		"""Parse the arguments given to the command into a dict"""
@@ -39,6 +39,11 @@ class Args:
 			action="store_true",
 		)
 		parser.add_argument(
+			"--source",
+			help="Donwload the libc source",
+			action="store_true",
+		)
+		parser.add_argument(
 			"--yara",
 			help="Specify the yara rules",
 		)
@@ -50,10 +55,5 @@ class Args:
 		parser.add_argument(
 			"--patch",
 			help="Patch the exe with a specific name",
-		)
-		parser.add_argument(
-			"--source",
-			help="Donwload the libc source",
-			action="store_true",
 		)
 		return parser.parse_args().__dict__
