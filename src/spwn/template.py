@@ -84,7 +84,8 @@ class Template:
 			new_content = new_content.replace(placeholder, replacement)
 
 		# Handle placeholders in script basename
-		script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
+		if exe:
+			script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
 
 		# Check if script exists, in case ask for a new name
 		while os.path.exists(script):
