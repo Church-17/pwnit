@@ -30,11 +30,10 @@ class Libc(Binary):
 		libc_version = match.group(1).decode() if match else None
 
 		# Retrieve libc id
-		try:
-			libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
-			libc_id = libc_matches[0]['id']
-		except:
-			libc_id = None
+		libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
+		libc_id = libc_matches[0]['id'] if libc_matches else None
+		if libc_matches == []:
+			log.warning(f"Recognized libc is not a standard libc!")
 
 		return libc_version, libc_id
 
