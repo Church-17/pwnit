@@ -38,6 +38,8 @@ def main():
 			print()
 
 	# Fix unbound variables
+		else:
+			libc = None
 	else:
 		cwd_libs = {}
 		libc = None
