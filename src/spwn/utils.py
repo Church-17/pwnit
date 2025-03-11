@@ -1,5 +1,38 @@
+import logging
+import os
 import subprocess
-from pwn import log, logging
+import shutil
+from pwn import log, options
+
+
+def ask(prompt: str, can_skip: bool = True) -> str:
+	while True:
+		received = input(f" [?] {prompt} > ")
+		if received or can_skip: return received
+		log.warning("Can't skip")
+
+
+def choose(prompt: str, opts: list[str], default: int | None = None) -> int:
+	assert opts
+	if len(opts) == 1: return 0
+	return options(prompt, opts, default)
+
+
+def fix_if_exist(path: str) -> str:
+	"""Check if debug dir exists, in case ask for a new name"""
+
+	while os.path.exists(path):
+		new_name = ask(f"{path} already exists: type another name (empty to overwrite)")
+		if new_name:
+			path = new_name
+		else:
+			if os.path.isdir(path):
+				shutil.rmtree(path)
+			else:
+				os.remove(path)
+			break
+	return path
+
 
 def run_command(args: list[str], progress: bool = False, **kwargs) -> str | None:
 	assert len(args) >= 1
@@ -33,10 +66,3 @@ def run_command(args: list[str], progress: bool = False, **kwargs) -> str | None
 			log.debug("Timeout")
 
 	return None
-
-
-def ask(prompt: str, can_skip: bool = True) -> str:
-	while True:
-		received = input(f" [?] {prompt} > ")
-		if received or can_skip: return received
-		log.warning("Can't skip")

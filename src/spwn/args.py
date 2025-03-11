@@ -9,6 +9,7 @@ class Args:
 		self.only: bool				= args["only"]
 		self.source: bool			= args["source"]
 		self.patch: str | None		= args["patch"]
+		self.seccomp: bool			= args["seccomp"]
 		self.yara: str | None		= args["yara"]
 		self.cwe: bool				= args["cwe"]
 
@@ -31,11 +32,11 @@ class Args:
 		)
 		parser.add_argument(
 			"-t", "--template",
-			help="Create the script from a template",
+			help="Create the script from the template",
 		)
 		parser.add_argument(
 			"-o", "--only",
-			help="Do only the actions specified via args",
+			help="Do only the actions specified in args",
 			action="store_true",
 		)
 		parser.add_argument(
@@ -44,16 +45,21 @@ class Args:
 			action="store_true",
 		)
 		parser.add_argument(
+			"--patch",
+			help="Patch the executable with the specified path",
+		)
+		parser.add_argument(
+			"--seccomp",
+			help="Check seccomp",
+			action="store_true",
+		)
+		parser.add_argument(
 			"--yara",
-			help="Specify the yara rules",
+			help="Check for given Yara rules",
 		)
 		parser.add_argument(
 			"--cwe",
 			help="Check for CWEs",
 			action="store_true",
-		)
-		parser.add_argument(
-			"--patch",
-			help="Patch the exe with a specific name",
 		)
 		return parser.parse_args().__dict__

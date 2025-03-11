@@ -1,8 +1,7 @@
 import re
 import os
-import shutil
 from pwn import log
-from spwn.utils import ask
+from spwn.utils import fix_if_exist
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions
@@ -22,7 +21,6 @@ LIBC_DEBUG_ABSPATH = "<libc_debug_abspath>"
 REMOTE = "<remote>"
 HOST = "<host>"
 PORT = "<port>"
-DEBUG_DIR = "<debug_dir>"
 INTERACTIONS = "<interactions>"
 
 
@@ -47,20 +45,19 @@ class Template:
 
 	def create_script(self,
 			script: str,
-			debug_dir: str,
 			remote: str | None = None,
 			exe: Exe | None = None,
 			libc: Libc | None = None,
 			interactions: Interactions | None = None,
 		) -> None:
 
-		if not self.template_content:
-			return
+		if not self.template_content: return
 
+		# Handle host and port from remote
 		host, port = remote.split(":", 1) if remote and ":" in remote else (None, None)
+
 		# Replace placeholders
 		replacements = {
-			DEBUG_DIR: debug_dir,
 			REMOTE: remote or "REMOTE",
 			HOST: host or "HOST",
 			PORT: port or "PORT",
@@ -83,19 +80,9 @@ class Template:
 		for placeholder, replacement in replacements.items():
 			new_content = new_content.replace(placeholder, replacement)
 
-		# Handle placeholders in script basename
-		if exe:
-			script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
-
-		# Check if script exists, in case ask for a new name
-		while os.path.exists(script):
-			new_name = ask(f"{script} already exists: type another name (empty to overwrite)")
-			if new_name:
-				script = new_name
-			else:
-				shutil.rmtree(script)
-				break
-
+		# Write new script
+		if exe: script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
+		script = fix_if_exist(script)
 		with open(script, "w") as script_file:
 			script_file.write(new_content)
 		log.success(f"Script \'{script}\' created")
