@@ -3,22 +3,20 @@
 This repository started as a fork of [the original spwn](https://github.com/MarcoMeinardi/spwn). It was a good tools for initialize a PWN challenge, but I wanted more customization, and since it had not been maintained for a couple of years, I started to look into the code to give more freedom to the user. In the end, I ended up completely refactoring the code and adding some useful features.
 
 ## Features
-- Auto detect files (binary, libc, loader)
-- Print basic info about the files:
+- Auto detect files from cwd (executable and all the libs)
+- Analyze executable:
   - `checksec`
-  - libc version
-  - potentially vulnerable functions
-  - cryptographic constants
+  - interesting functions
   - seccomp rules
+  - cryptographic constants
   - CWEs
-- Download and unstrip the libs and the loader related to the libc
-- Download the libc source code
-- Download loader from libc version (if missing)
+- Patch executable:
+  - Download and unstrip the libs (loader included) related to the detected libc
+  - Set runpath and interpreter of the executable with the libs from the cwd or from the downloaded libs
 - Set binary and loader executable
-- Set runpath and interpreter for the debug binary
 - Interactively generate functions to interact with the binary
 - Generate a basic script from a template
-- Launch custom user-provided commands
+- Download the libc source code
 
 ## Usage
 ```
