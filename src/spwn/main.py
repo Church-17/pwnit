@@ -29,19 +29,25 @@ def main():
 		cwd_libs = recognize_libs(cwd_files)
 
 		# Recognize libc
-		libc = Libc(cwd_libs["libc"]) if "libc" in cwd_libs else None
-		if libc:
+		if "libc" in cwd_libs:
+			libc = Libc(cwd_libs["libc"])
+
 			# Download libc source
 			if config.download_libc_source: libc.download_source()
 
 			print()
+
+	# Fix unbound variables
+	else:
+		cwd_libs = {}
+		libc = None
 
 	if exe:
 		# Describe
 		exe.describe()
 		exe.check_functions(config.check_functions)
 
-		# Patch exe (checking exe.statically_linked, libc and cwd_libs are not unbound)
+		# Patch
 		if config.patch_path and (not exe.statically_linked): exe.patch(config.patch_path, cwd_libs, libc)
 
 		# Analyze
@@ -51,7 +57,6 @@ def main():
 		print()
 
 	if config.template_file:
-
 		# Interactions
 		interactions = Interactions(config.pwntube_variable, config.tab) if config.interactions else None
 		
