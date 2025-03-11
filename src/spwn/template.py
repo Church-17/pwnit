@@ -81,7 +81,7 @@ class Template:
 			new_content = new_content.replace(placeholder, replacement)
 
 		# Write new script
-		if exe: script = script.replace(EXE_BASENAME, os.path.basename(exe.path))
+		script = script.replace(EXE_BASENAME, (os.path.basename(exe.path) if exe else ""))
 		script = fix_if_exist(script)
 		with open(script, "w") as script_file:
 			script_file.write(new_content)
