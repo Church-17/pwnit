@@ -1,8 +1,8 @@
-import logging
 import os
 import subprocess
 import shutil
 from pwn import log, options
+from pwnlib.log import Progress
 
 
 def ask(prompt: str, can_skip: bool = True) -> str:
@@ -34,35 +34,39 @@ def fix_if_exist(path: str) -> str:
 	return path
 
 
-def run_command(args: list[str], progress: bool = False, **kwargs) -> str | None:
+def run_command(args: list[str], progress: Progress | None = None, **kwargs) -> str | None:
+	"""Run a command, logging out failures msg in the progress or in the log"""
+	
 	assert len(args) >= 1
 
-	# Print progress if requested
-	level = logging.INFO if progress else logging.DEBUG
-	with log.progress(args[0], "Analyzing... (press Ctrl+C to stop)", level=level) as waiting:
+	def failure(msg: str):
+		if progress:
+			progress.failure(msg)
+		else:
+			log.failure(msg)
 
-		# Try executing command
-		try:
-			cmd_output = subprocess.check_output(args, encoding="latin-1", **kwargs)
-			waiting.success("Success!")
-			return cmd_output
+	# Try executing command
+	try:
+		cmd_output = subprocess.check_output(args, encoding="latin-1", **kwargs)
+		return cmd_output
 
-		# Handle command not found
-		except FileNotFoundError as err:
-			waiting.failure(f"To analyze please install {args[0]}")
+	# Handle command not found
+	except FileNotFoundError as err:
+		failure(f"To execute this please install {args[0]}")
 
-		# Handle interrupt
-		except KeyboardInterrupt as err:
-			waiting.failure(f"Interrupted")
+	# Handle interrupt
+	except KeyboardInterrupt as err:
+		failure(f"{args[0]} interrupted")
 
-		# Handle errors
-		except subprocess.CalledProcessError as err:
-			waiting.failure("Failed!")
-			log.debug(err)
+	# Handle errors
+	except subprocess.CalledProcessError as err:
+		failure(f"{args[0]} failed")
+		log.debug(err)
+		log.debug(err.stderr)
 
-		# Handle timeout
-		except subprocess.TimeoutExpired as err:
-			waiting.success("Unsuccessful")
-			log.debug("Timeout")
+	# Handle timeout
+	except subprocess.TimeoutExpired as err:
+		log.debug(f"{args[0]} timeout")
+		return ""
 
 	return None
