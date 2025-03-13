@@ -77,12 +77,12 @@ def fix_if_exist(path: Path) -> Path:
 	"""Check if debug dir exists, in case ask for a new name"""
 
 	while path.exists():
-		new_name = ask(f"{path} already exists: type another name (empty to overwrite)")
+		new_name = ask(f"{path} already exists: type another path (empty to overwrite)")
 		if new_name:
-			if "/" in new_name:
-				log.warning("Insert only the basename directory")
-			else:
-				path = path.parent / new_name
+			try:
+				path = Path(new_name)
+			except:
+				log.warning(f"{new_name} is not a valid path")
 		else:
 			if path.is_dir():
 				shutil.rmtree(path)
