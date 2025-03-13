@@ -104,6 +104,8 @@ class Exe(Binary):
 			# Change exe debug path
 			if cmd_output is not None:
 				self.debug_path = patch_path.resolve()
+				if debug_dir.is_relative_to("."):
+					log.warning("The patched exe can run only from this working directory")
 
 
 	def seccomp(self, timeout: float = 1) -> None:
