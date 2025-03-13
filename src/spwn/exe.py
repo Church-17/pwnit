@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import shutil
 from pwn import log, libcdb, context
 from pwnlib.term.text import red, yellow, green
@@ -9,18 +10,18 @@ from spwn.libc import Libc
 
 
 class Exe(Binary):
-	def __init__(self, filepath: str) -> None:
+	def __init__(self, filepath: Path) -> None:
 		super().__init__(filepath)
 
 		# Retrieve required libs
-		self.required_libs = set()
+		self.required_libs: set[str] = set()
 		if not self.statically_linked:
 			try:
-				self.required_libs = {os.path.basename(lib) for lib in self.libs if lib != self.path}
+				self.required_libs = {Path(Path(lib).name) for lib in self.libs if lib != self.path}
 			except:
 				ldd_output = run_command(["ldd", self.path], timeout=1)
 				if ldd_output:
-					self.required_libs = {os.path.basename(line.strip().split(" ", 1)[0]) for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
+					self.required_libs = {Path(Path(line.strip().split(" ", 1)[0]).name) for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
 			if not self.required_libs:
 				log.failure("Impossible to retrieve the requested libs")
 
@@ -41,13 +42,16 @@ class Exe(Binary):
 			log.success(f"There are some dangerous functions: {', '.join(found_functions)}")
 
 
-	def patch(self, patch_path: str, cwd_libs: dict[str, str], libc: Libc | None) -> None:
+	def patch(self, patch_path: Path, cwd_libs: dict[str, Path], libc: Libc | None) -> None:
 		"""Patch the executable with the given libc"""
 
+		# Handle 
+		patch_path = Path(str(patch_path).replace("<exe_basename>", self.path.name))
+
 		# Create debug dir
-		patch_path = patch_path.replace("<exe_basename>", os.path.basename(self.path))
-		debug_dir = fix_if_exist(os.path.dirname(patch_path))
-		os.makedirs(debug_dir)
+		debug_dir = fix_if_exist(patch_path.parent)
+		debug_dir.mkdir(parents=True)
+		patch_path = debug_dir / patch_path.name
 
 		with log.progress("Patch", "Copying and unstripping libs...") as waiting:
 
@@ -58,7 +62,7 @@ class Exe(Binary):
 			# Copy the libs from cwd
 			for lib, file in cwd_libs.items():
 				if lib in required_libs_dict:
-					new_path = os.path.join(debug_dir, required_libs_dict[lib])
+					new_path = debug_dir / required_libs_dict[lib]
 					shutil.copy2(file, new_path)
 					required_libs_dict.pop(lib)
 
@@ -66,42 +70,41 @@ class Exe(Binary):
 					if lib == "libc" and libc:
 						with context.silent:
 							try:
-								libcdb.unstrip_libc(new_path)
+								libcdb.unstrip_libc(str(new_path))
 							except:
 								pass
-						libc.debug_path = new_path
+						libc.debug_path = new_path.resolve()
 					elif lib == "ld":
 						loader_path = new_path
 
 			# Copy libs from downloaded libs
 			if libc and libc.libs_path:
-				libs_set = set(os.listdir(libc.libs_path))
+				libs_set = {Path(lib.name) for lib in libc.libs_path.iterdir()}
 				for lib, file in required_libs_dict.copy().items():
 					if file in libs_set:
-						shutil.copy2(os.path.join(libc.libs_path, file), debug_dir)
+						shutil.copy2(libc.libs_path / file, debug_dir)
 						required_libs_dict.pop(lib)
 
 						# Handle specific lib
 						if lib == "ld":
-							loader_path = os.path.join(debug_dir, file)
+							loader_path = debug_dir / file
 				
 			# Check missing libs
 			if required_libs_dict:
-				log.warning(f"Missing libs for patch: {', '.join([yellow(lib) for lib in required_libs_dict.values()])}")
+				log.warning(f"Missing libs for patch: {', '.join([yellow(str(lib)) for lib in required_libs_dict.values()])}")
 
 			# Run patchelf
 			waiting.status("Run patchelf...")
-			new_debug_path = os.path.join(debug_dir, os.path.basename(patch_path))
-			cmd_args = ["patchelf", "--set-rpath", os.path.join(".", os.path.relpath(debug_dir))]
+			cmd_args = ["patchelf", "--set-rpath", debug_dir]
 			if loader_path:
-				os.chmod(loader_path, 0o755)
-				cmd_args += ["--set-interpreter", os.path.join(".", os.path.relpath(loader_path))]
-			cmd_args += ["--output", new_debug_path, self.path]
+				loader_path.chmod(0o755)
+				cmd_args += ["--set-interpreter", loader_path]
+			cmd_args += ["--output", patch_path, self.path]
 			cmd_output = run_command(cmd_args, progress=waiting)
 
 			# Change exe debug path
 			if cmd_output is not None:
-				self.debug_path = os.path.abspath(new_debug_path)
+				self.debug_path = patch_path.resolve()
 
 
 	def seccomp(self, timeout: float = 1) -> None:
@@ -129,16 +132,18 @@ class Exe(Binary):
 					waiting.failure("Executable returns an error")
 
 
-	def yara(self, yara_rules: str) -> None:
+	def yara(self, yara_rules: Path) -> None:
 		"""Search for pattern with yara"""
 
-		if not os.path.isfile(yara_rules):
+		# Check Yara rules file
+		if not yara_rules.is_file():
 			log.failure("Yara rules file doesn't exists. The exe will not be analyzed with yara")
 			return
 
+		# Search patterns
 		import yara
-		rules = yara.compile(yara_rules)
-		matches = rules.match(self.path)
+		rules = yara.compile(str(yara_rules))
+		matches = rules.match(str(self.path))
 		if matches:
 			log.success("Yara found something:")
 			for match in matches:

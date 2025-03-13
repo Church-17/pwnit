@@ -1,14 +1,17 @@
 import re
+from pathlib import Path
 import os
 import tarfile
+from urllib.parse import urlparse
 import requests
 from pwn import log, libcdb, context
+from spwn.utils import handle_path
 from spwn.binary import Binary
 
 
 class Libc(Binary):
-	def __init__(self, name: str):
-		super().__init__(name)
+	def __init__(self, filepath: Path):
+		super().__init__(filepath)
 
 		# Retrieve libc id
 		with log.progress("Libc version", "Retrieving libc ID from libc.rip...") as waiting:
@@ -46,7 +49,7 @@ class Libc(Binary):
 		with log.progress("Retrieve libs", "Downloading...") as waiting:
 			with context.silent:
 				try:
-					self.libs_path = libcdb.download_libraries(self.path)
+					self.libs_path = handle_path(libcdb.download_libraries(str(self.path)))
 				except requests.RequestException:
 					self.libs_path = None
 			if self.libs_path:
@@ -55,7 +58,7 @@ class Libc(Binary):
 				waiting.failure("Failed to download libs")
 
 
-	def download_source(self, dirpath: str = ".") -> None:
+	def download_source(self, dirpath: Path = Path.cwd()) -> None:
 		"""Download the source code of this libc version"""
 		# TODO thread and cache
 
@@ -76,9 +79,8 @@ class Libc(Binary):
 			if not response:
 				waiting.failure(f"Download from {url} failed")
 				return None
-			archive_path = os.path.join("/tmp", os.path.basename(url))
-			with open(archive_path, "bw") as archive:
-				archive.write(response.content)
+			archive_path = Path(f"/tmp/{urlparse(url).path.rsplit("/", 1)[-1]}")
+			archive_path.write_bytes(response.content)
 
 			# Extract archive
 			waiting.status("Extracting...")

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import subprocess
 import shutil
 from pwn import log, options
@@ -12,29 +13,52 @@ def ask(prompt: str, can_skip: bool = True) -> str:
 		log.warning("Can't skip")
 
 
-def choose(prompt: str, opts: list[str], default: int | None = None) -> int:
+def choose(prompt: str, opts: list, default: int | None = None) -> int:
 	assert opts
 	if len(opts) == 1: return 0
-	return options(prompt, opts, default)
+	return options(prompt, list(map(str, opts)), default)
 
 
-def fix_if_exist(path: str) -> str:
+def handle_path(path: str | None) -> Path | None:
+	return Path(path).expanduser() if path else None
+
+
+def check_file(path: Path) -> bool:
+	if not path.is_file():
+		if path.exists():
+			raise FileExistsError(f"{path} exists but it's not a regular file")
+		return False
+	return True
+
+
+def check_dir(path: Path) -> bool:
+	if not path.is_dir():
+		if path.exists():
+			raise FileExistsError(f"{path} exists but it's not a directory")
+		return False
+	return True
+
+
+def fix_if_exist(path: Path) -> Path:
 	"""Check if debug dir exists, in case ask for a new name"""
 
-	while os.path.exists(path):
+	while path.exists():
 		new_name = ask(f"{path} already exists: type another name (empty to overwrite)")
 		if new_name:
-			path = new_name
+			if "/" in new_name:
+				log.warning("Insert only the basename directory")
+			else:
+				path = path.parent / new_name
 		else:
-			if os.path.isdir(path):
+			if path.is_dir():
 				shutil.rmtree(path)
 			else:
-				os.remove(path)
+				path.unlink()
 			break
 	return path
 
 
-def run_command(args: list[str], progress: Progress | None = None, **kwargs) -> str | None:
+def run_command(args: list, progress: Progress | None = None, **kwargs) -> str | None:
 	"""Run a command, logging out failures msg in the progress or in the log"""
 	
 	assert len(args) >= 1

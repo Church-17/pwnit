@@ -1,13 +1,13 @@
 import re
-import os
+from pathlib import Path
 from spwn.utils import choose, run_command
 
 
-def recognize_exe(path_list: list[str]) -> str | None:
+def recognize_exe(path_list: list[Path]) -> Path | None:
 	"""Recognize the executable from a list of files"""
 
 	# Initialize potential executables list
-	possible_exes: list[str] = []
+	possible_exes: list[Path] = []
 
 	# Loop through path list
 	for file in path_list:
@@ -26,18 +26,18 @@ def recognize_exe(path_list: list[str]) -> str | None:
 	return possible_exes[choose("Select executable:", possible_exes)] if possible_exes else None
 
 
-def recognize_libs(path_list: list[str], libs_names: list[str] = []) -> dict[str, str]:
+def recognize_libs(path_list: list[Path], libs_names: list[str] = []) -> dict[str, Path]:
 	"""Recognize the libs from a list of files, filtering for some of them"""
 
 	# Initialize potential libriaries lists
-	possible_libs: dict[str, list[str]] = {}
+	possible_libs: dict[str, list[Path]] = {}
+	search_for = r'|'.join(libs_names) if libs_names else r"[A-Za-z]+"
 
 	# Loop through path
 	for file in path_list:
 
 		# Search libs regex
-		search_for = r'|'.join(libs_names) if libs_names else r"[A-Za-z]+"
-		match = re.search(rf"^({search_for})(?:[^A-Za-z].*)?\.so", os.path.basename(file))
+		match = re.search(rf"^({search_for})(?:[^A-Za-z].*)?\.so", file.name)
 		if not match: continue
 
 		# Append file to possible libs

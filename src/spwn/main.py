@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from spwn.args import Args
 from spwn.config import Config
 from spwn.file_manage import recognize_exe, recognize_libs
@@ -13,16 +14,18 @@ def main():
 	args = Args()
 	config = Config(args)
 
+
 	# List files of cwd
-	cwd_files = os.listdir()
+	cwd_files = list(Path(".").iterdir())
 
 	# Recognize exe
 	exe_path = recognize_exe(cwd_files)
 	if exe_path:
-		os.chmod(exe_path, 0o755)
+		exe_path.chmod(0o755)
 		exe = Exe(exe_path)
 	else:
 		exe = None
+
 
 	# Recognize libs
 	if (not exe) or (not exe.statically_linked):
@@ -44,6 +47,7 @@ def main():
 		cwd_libs = {}
 		libc = None
 
+
 	if exe:
 		# Describe
 		exe.describe()
@@ -58,11 +62,12 @@ def main():
 		if config.cwe: exe.cwe()
 		print()
 
-	if config.template_file:
+
+	if config.template_path:
 		# Interactions
 		interactions = Interactions(config.pwntube_variable, config.tab) if config.interactions else None
 		
 		# Create script
-		template = Template(config.template_file)
-		template.create_script(config.script_basename, args.remote, exe, libc, interactions)
+		template = Template(config.template_path)
+		template.create_script(config.script_path, args.remote, exe, libc, interactions)
 
