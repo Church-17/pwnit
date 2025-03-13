@@ -1,7 +1,7 @@
-import json
 from pathlib import Path
+import json
 import requests
-from spwn.utils import handle_path, check_file, check_dir
+from spwn.file_manage import handle_path, check_file, check_dir
 from spwn.args import Args
 
 CONFIG_DIR_PATH = Path("~/.config/spwn/").expanduser()

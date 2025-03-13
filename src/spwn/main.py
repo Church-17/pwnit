@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from spwn.args import Args
 from spwn.config import Config

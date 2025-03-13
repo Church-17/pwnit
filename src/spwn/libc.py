@@ -1,11 +1,10 @@
-import re
 from pathlib import Path
-import os
+import re
 import tarfile
 from urllib.parse import urlparse
 import requests
 from pwn import log, libcdb, context
-from spwn.utils import handle_path
+from spwn.file_manage import handle_path
 from spwn.binary import Binary
 
 

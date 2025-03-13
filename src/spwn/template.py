@@ -1,8 +1,7 @@
-import re
-import os
 from pathlib import Path
+import re
 from pwn import log
-from spwn.utils import fix_if_exist
+from spwn.file_manage import fix_if_exist
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions

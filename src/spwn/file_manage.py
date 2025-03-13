@@ -1,6 +1,8 @@
 import re
 from pathlib import Path
-from spwn.utils import choose, run_command
+import shutil
+from pwn import log
+from spwn.utils import ask, choose, run_command
 
 
 def recognize_exe(path_list: list[Path]) -> Path | None:
@@ -49,3 +51,42 @@ def recognize_libs(path_list: list[Path], libs_names: list[str] = []) -> dict[st
 
 	# Select actual libs and return them
 	return {lib_name: opts[choose(f"Select {lib_name}:", opts)] for lib_name, opts in possible_libs.items()}
+
+
+def handle_path(path: str | None) -> Path | None:
+	return Path(path).expanduser() if path else None
+
+
+def check_file(path: Path) -> bool:
+	if not path.is_file():
+		if path.exists():
+			raise FileExistsError(f"{path} exists but it's not a regular file")
+		return False
+	return True
+
+
+def check_dir(path: Path) -> bool:
+	if not path.is_dir():
+		if path.exists():
+			raise FileExistsError(f"{path} exists but it's not a directory")
+		return False
+	return True
+
+
+def fix_if_exist(path: Path) -> Path:
+	"""Check if debug dir exists, in case ask for a new name"""
+
+	while path.exists():
+		new_name = ask(f"{path} already exists: type another name (empty to overwrite)")
+		if new_name:
+			if "/" in new_name:
+				log.warning("Insert only the basename directory")
+			else:
+				path = path.parent / new_name
+		else:
+			if path.is_dir():
+				shutil.rmtree(path)
+			else:
+				path.unlink()
+			break
+	return path

@@ -1,10 +1,9 @@
-import os
 from pathlib import Path
 import shutil
 from pwn import log, libcdb, context
 from pwnlib.term.text import red, yellow, green
-from spwn.utils import run_command, fix_if_exist
-from spwn.file_manage import recognize_libs
+from spwn.utils import run_command
+from spwn.file_manage import recognize_libs, fix_if_exist
 from spwn.binary import Binary
 from spwn.libc import Libc
 
