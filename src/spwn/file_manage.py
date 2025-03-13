@@ -79,10 +79,7 @@ def fix_if_exist(path: Path) -> Path:
 	while path.exists():
 		new_name = ask(f"{path} already exists: type another path (empty to overwrite)")
 		if new_name:
-			try:
-				path = Path(new_name)
-			except:
-				log.warning(f"{new_name} is not a valid path")
+			path = Path(new_name)
 		else:
 			if path.is_dir():
 				shutil.rmtree(path)
