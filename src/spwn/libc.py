@@ -59,7 +59,6 @@ class Libc(Binary):
 
 	def download_source(self, dirpath: Path = Path.cwd()) -> None:
 		"""Download the source code of this libc version"""
-		# TODO thread and cache
 
 		with log.progress("Libc source") as waiting:
 
