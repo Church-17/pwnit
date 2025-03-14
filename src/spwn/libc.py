@@ -48,7 +48,7 @@ class Libc(Binary):
 		with log.progress("Retrieve libs", "Downloading...") as waiting:
 			with context.silent:
 				try:
-					self.libs_path = handle_path(libcdb.download_libraries(str(self.path)))
+					self.libs_path = handle_path(libcdb.download_libraries(self.path))
 				except requests.RequestException:
 					self.libs_path = None
 			if self.libs_path:
