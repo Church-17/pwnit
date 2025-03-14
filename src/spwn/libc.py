@@ -31,9 +31,7 @@ class Libc(Binary):
 					log.warning(f"Recognized libc is not a standard libc")
 
 				# Retrieve libc version
-				with open(self.path, "br") as libc_file:
-					libc_content = libc_file.read()
-				match = re.search(br"release version (\d+(?:\.\d+)+)", libc_content)
+				match = re.search(br"release version (\d+(?:\.\d+)+)", self.path.read_bytes())
 				if match:
 					self.libc_version = match.group(1).decode()
 				else:
