@@ -16,11 +16,11 @@ class Exe(Binary):
 		self.required_libs: set[str] = set()
 		if not self.statically_linked:
 			try:
-				self.required_libs = {Path(Path(lib).name) for lib in self.libs if lib != self.path}
+				self.required_libs = {Path(lib).name for lib in self.libs if lib != self.path}
 			except:
 				ldd_output = run_command(["ldd", self.path], timeout=1)
 				if ldd_output:
-					self.required_libs = {Path(Path(line.strip().split(" ", 1)[0]).name) for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
+					self.required_libs = {Path(line.strip().split(" ", 1)[0]).name for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
 			if not self.required_libs:
 				log.failure("Impossible to retrieve the requested libs")
 
@@ -55,7 +55,7 @@ class Exe(Binary):
 		with log.progress("Patch", "Copying and unstripping libs...") as waiting:
 
 			# Get libs names of the required libs
-			required_libs_dict = recognize_libs(self.required_libs)
+			required_libs_dict = recognize_libs({Path(lib) for lib in self.required_libs})
 			loader_path = None
 
 			# Copy the libs from cwd
