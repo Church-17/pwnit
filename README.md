@@ -14,8 +14,8 @@ This repository started as a fork of [the original spwn](https://github.com/Marc
   - Download and unstrip the libs (loader included) related to the detected libc
   - Set runpath and interpreter of the executable with the libs from the cwd or from the downloaded libs
 - Set binary and loader executable
-- Interactively generate functions to interact with the binary
-- Generate a basic script from a template
+- Interactively generate functions to interact with the binary with a menu
+- Generate the solve script from your template
 - Download the libc source code
 
 ## Usage
@@ -42,3 +42,14 @@ options:
 If the files have weird names (such as the libc name not starting with "libc"), the autodetection will fail, the best fix for this is to rename the files.
 
 To understand how the interactions creation works, I suggest to just try it out. It should be pretty straight forward, but if you want to pwn as fast as possible, you cannot waste any time :)
+
+## Installation
+Non python tools:
+```bash
+sudo apt update
+sudo apt install patchelf elfutils ruby-rubygems
+# Or the equivalent for you package manager
+sudo gem install seccomp-tools  # Might not need `sudo`
+```
+To install [cwe_checker](https://github.com/fkie-cad/cwe_checker)
+follow the instructions in their repository.
