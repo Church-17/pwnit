@@ -105,7 +105,10 @@ class Exe(Binary):
 			if cmd_output is not None:
 				self.debug_path = patch_path.resolve()
 				if debug_dir.is_relative_to("."):
-					log.warning("The patched exe can run only from this working directory")
+					if loader_path:
+						log.warning("The patched exe can run only from this working directory")
+					else:
+						log.warning("The patched exe can run with the fixed libs only from this working directory")
 
 
 	def seccomp(self, timeout: float = 1) -> None:
