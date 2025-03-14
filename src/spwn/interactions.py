@@ -31,7 +31,7 @@ class InteractionFunction:
 		self.arguments: list[Argument] = []
 		
 		# Option number
-		self.option_number = ask("Option number", can_skip=False)
+		self.send_to_select = ask("Send to select it", can_skip=False)
 			
 		# Arguments
 		while True:
@@ -43,7 +43,7 @@ class InteractionFunction:
 	def dump(self, pwntube_variable: str, menu_recvuntil: str, tab: str):
 		result = "\n".join([
 			f'def {self.name}({", ".join(arg.name for arg in self.arguments)}):',
-			f'{tab}{pwntube_variable}.sendlineafter(b"{menu_recvuntil}", b"{self.option_number}")',
+			f'{tab}{pwntube_variable}.sendlineafter(b"{menu_recvuntil}", b"{self.send_to_select}")',
 		] + [
 			f'{tab}{pwntube_variable}.sendlineafter(b"{arg.sendafter}", {arg.name} if isinstance({arg.name}, bytes) else str({arg.name}).encode())'
 			for arg in self.arguments
