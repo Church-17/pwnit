@@ -1,6 +1,6 @@
 import subprocess
 from pwn import log, options
-from pwnlib.log import Progress
+from pwnlib.log import Progress, Logger
 
 
 def ask(prompt: str, can_skip: bool = True) -> str:
@@ -16,16 +16,10 @@ def choose(prompt: str, opts: list, default: int | None = None) -> int:
 	return options(prompt, list(map(str, opts)), default)
 
 
-def run_command(args: list, progress: Progress | None = None, **kwargs) -> str | None:
+def run_command(args: list, progress: Progress | Logger = log, **kwargs) -> str | None:
 	"""Run a command, logging out failures msg in the progress or in the log"""
 	
 	assert len(args) >= 1
-
-	def failure(msg: str):
-		if progress:
-			progress.failure(msg)
-		else:
-			log.failure(msg)
 
 	# Try executing command
 	try:
@@ -34,15 +28,15 @@ def run_command(args: list, progress: Progress | None = None, **kwargs) -> str |
 
 	# Handle command not found
 	except FileNotFoundError as err:
-		failure(f"To execute this please install {args[0]}")
+		progress.failure(f"To execute this please install {args[0]}")
 
 	# Handle interrupt
 	except KeyboardInterrupt as err:
-		failure(f"{args[0]} interrupted")
+		progress.failure(f"{args[0]} interrupted")
 
 	# Handle errors
 	except subprocess.CalledProcessError as err:
-		failure(f"{args[0]} failed")
+		progress.failure(f"{args[0]} failed")
 		log.debug(err)
 		log.debug(err.stderr)
 
