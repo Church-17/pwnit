@@ -64,7 +64,7 @@ def main():
 
 	if config.template_path:
 		# Interactions
-		interactions = Interactions(config.pwntube_variable, config.tab) if config.interactions and exe else None
+		interactions = Interactions(exe, config.pwntube_variable, config.tab) if config.interactions and exe else None
 		
 		# Create script
 		template = Template(config.template_path)

@@ -1,15 +1,26 @@
+from pwn import process, context, log
 from spwn.utils import ask
-
+from spwn.exe import Exe
 
 class Interactions:
-	def __init__(self, pwntube_variable: str, tab: str):
-		self.pwntube_variable = pwntube_variable
-		self.tab = tab
+	def __init__(self, exe: Exe, pwntube_variable: str, tab: str):
+		self.pwntube_variable: str = pwntube_variable
+		self.tab: str = tab
 		self.functions: list[InteractionFunction] = []
+		self.menu_recvuntil: str = ""
 
 		# Menu recvuntil
-		self.menu_recvuntil = ask("Menu recvuntil (empty to skip interactions)")
-		if not self.menu_recvuntil: return
+		if exe.runnable_path:
+			with context.silent:
+				tube = process([str(exe.runnable_path)])
+				self.menu_recvuntil = tube.recvrepeat(0.5).strip().split(b" ")[-1].split(b"\n")[-1].decode()
+				tube.close()
+		
+		if self.menu_recvuntil:
+			log.success(f"Menu recvuntil autodetected: {self.menu_recvuntil}")
+		else:
+			self.menu_recvuntil = ask("Menu recvuntil (empty to finish interactions)")
+			if not self.menu_recvuntil: return
 
 		# Functions
 		while True:
