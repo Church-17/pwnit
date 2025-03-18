@@ -11,6 +11,8 @@ from spwn.libc import Libc
 class Exe(Binary):
 	def __init__(self, filepath: Path) -> None:
 		super().__init__(filepath)
+		self.runnable_path: Path | None = None
+		self.set_runnable_path(self.path)
 
 		# Retrieve required libs
 		self.required_libs: set[str] = set()
@@ -23,6 +25,20 @@ class Exe(Binary):
 					self.required_libs = {Path(line.strip().split(" ", 1)[0]).name for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
 			if not self.required_libs:
 				log.failure("Impossible to retrieve the requested libs")
+
+
+	def set_runnable_path(self, path: Path) -> None:
+		"""Set the exe path that correctly run"""
+
+		# Return if the runnable path is been already found
+		if self.runnable_path: return
+		
+		# Check if path is runnable without errors
+		check_error = run_command([path], timeout=0.5)
+		if check_error is None: return
+		
+		# Set runnable path
+		self.runnable_path = path
 
 
 	def describe(self):
@@ -104,11 +120,14 @@ class Exe(Binary):
 			# Change exe debug path
 			if cmd_output is not None:
 				self.debug_path = patch_path.resolve()
+				self.set_runnable_path(self.debug_path)
+
+				# Warning about the relative runpath and the relative interpreter path
 				if debug_dir.is_relative_to("."):
 					if loader_path:
-						log.warning("The patched exe can run only from this working directory")
+						log.info("The patched exe can run only from this working directory")
 					else:
-						log.warning("The patched exe can run with the fixed libs only from this working directory")
+						log.info("The patched exe can run with the fixed libs only from this working directory")
 
 
 	def seccomp(self, timeout: float = 1) -> None:
@@ -117,23 +136,17 @@ class Exe(Binary):
 		# Check if exists a seccomp function
 		if ("prctl" in self.sym) or any(True for function in self.sym if function.startswith("seccomp")):
 			with log.progress("Seccomp", "Potential seccomp detected, analyzing...") as waiting:
-				
-				# Check if exe can run
-				for path in [self.debug_path, self.path]:
-					with context.silent:
-						check_error = run_command([path], timeout=0.5)
 
-					# Run command if exe doesn't return an error
-					if check_error is not None:
-						cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.debug_path}\' </dev/null >&0 2>&0"], progress=waiting, timeout=timeout)
-						if cmd_output:
-							waiting.success("Found something")
-							log.info(cmd_output)
-						else:
-							waiting.success("Not found anything")
-						break
+				# Use seccompt-tools with the runnable exe
+				if self.runnable_path:
+					cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.runnable_path}\' </dev/null >&0 2>&0"], progress=waiting, timeout=timeout)
+					if cmd_output:
+						waiting.success("Found something")
+						log.info(cmd_output)
+					else:
+						waiting.success("Not found anything")
 				else:
-					waiting.failure("Executable returns an error")
+					waiting.failure("The executable cannot run")
 
 
 	def yara(self, yara_rules: Path) -> None:
