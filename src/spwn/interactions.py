@@ -9,13 +9,14 @@ class Interactions:
 		self.functions: list[InteractionFunction] = []
 		self.menu_recvuntil: str = ""
 
-		# Menu recvuntil
+		# Try autodetect menu recvuntil
 		if exe.runnable_path:
 			with context.silent:
 				tube = process([str(exe.runnable_path)])
 				self.menu_recvuntil = tube.recvrepeat(0.5).strip().split(b" ")[-1].split(b"\n")[-1].decode()
 				tube.close()
 		
+		# Menu recvuntil
 		if self.menu_recvuntil:
 			log.success(f"Menu recvuntil autodetected: \'{self.menu_recvuntil}\'")
 		else:
