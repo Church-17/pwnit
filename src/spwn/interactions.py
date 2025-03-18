@@ -17,7 +17,7 @@ class Interactions:
 				tube.close()
 		
 		if self.menu_recvuntil:
-			log.success(f"Menu recvuntil autodetected: {self.menu_recvuntil}")
+			log.success(f"Menu recvuntil autodetected: \'{self.menu_recvuntil}\'")
 		else:
 			self.menu_recvuntil = ask("Menu recvuntil (empty to finish interactions)")
 			if not self.menu_recvuntil: return
