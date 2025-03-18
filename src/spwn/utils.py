@@ -29,7 +29,7 @@ def run_command(args: list, progress: Progress | None = None, **kwargs) -> str |
 
 	# Try executing command
 	try:
-		cmd_output = subprocess.check_output(args, encoding="latin-1", **kwargs)
+		cmd_output = subprocess.check_output(args, stderr=subprocess.DEVNULL, encoding="latin-1", **kwargs)
 		return cmd_output
 
 	# Handle command not found
