@@ -34,7 +34,8 @@ class Exe(Binary):
 		if self.runnable_path: return
 		
 		# Check if path is runnable without errors
-		check_error = run_command([path], timeout=0.5)
+		with context.silent:
+			check_error = run_command([path], timeout=0.5)
 		if check_error is None: return
 		
 		# Set runnable path
