@@ -38,8 +38,6 @@ def main():
 			if config.download_libc_source: libc.download_source()
 
 			print()
-
-	# Fix unbound variables
 		else:
 			libc = None
 	else:
