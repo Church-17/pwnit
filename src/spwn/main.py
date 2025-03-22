@@ -5,7 +5,7 @@ from spwn.file_manage import recognize_exe, recognize_libs
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions
-from spwn.template import Template
+from spwn.template import create_script
 
 def main():
 
@@ -65,6 +65,7 @@ def main():
 		interactions = Interactions(exe, config.pwntube_variable, config.tab) if config.interactions and exe else None
 		
 		# Create script
-		template = Template(config.template_path)
-		template.create_script(config.script_path, args.remote, exe, libc, interactions)
+		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
+	
+
 
