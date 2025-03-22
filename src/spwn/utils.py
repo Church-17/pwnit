@@ -18,7 +18,7 @@ def choose(prompt: str, opts: list, default: int | None = None) -> int:
 	return options(prompt, list(map(str, opts)), default)
 
 
-def run_command(args: list, progress: Progress | Logger = log, **kwargs) -> str | None:
+def run_command(args: list, progress_log: Progress | Logger = log, **kwargs) -> str | None:
 	"""Run a command, logging out failures msg in the progress or in the log"""
 	
 	assert len(args) >= 1
@@ -30,15 +30,15 @@ def run_command(args: list, progress: Progress | Logger = log, **kwargs) -> str 
 
 	# Handle command not found
 	except FileNotFoundError as err:
-		progress.failure(f"To execute this please install {args[0]}")
+		progress_log.failure(f"To execute this please install {args[0]}")
 
 	# Handle interrupt
 	except KeyboardInterrupt as err:
-		progress.failure(f"{args[0]} interrupted")
+		progress_log.failure(f"{args[0]} interrupted")
 
 	# Handle errors
 	except subprocess.CalledProcessError as err:
-		progress.failure(f"{args[0]} failed")
+		progress_log.failure(f"{args[0]} failed")
 		log.debug(err)
 		log.debug(err.stderr)
 
