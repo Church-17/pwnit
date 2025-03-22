@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
-from pwn import log
 from spwn.placeholders import *
+from spwn.utils import log
 from spwn.file_manage import fix_if_exist
 from spwn.exe import Exe
 from spwn.libc import Libc

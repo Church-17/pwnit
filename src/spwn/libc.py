@@ -3,7 +3,8 @@ import re
 import tarfile
 from urllib.parse import urlparse
 import requests
-from pwn import log, libcdb, context
+from pwn import libcdb
+from spwn.utils import log, log_silent
 from spwn.file_manage import handle_path
 from spwn.binary import Binary
 
@@ -14,7 +15,7 @@ class Libc(Binary):
 
 		# Retrieve libc id
 		with log.progress("Libc version", "Retrieving libc ID from libc.rip...") as waiting:
-			with context.silent:
+			with log_silent:
 				libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
 			if libc_matches:
 				self.libc_id = libc_matches[0]['id']
@@ -44,7 +45,7 @@ class Libc(Binary):
 
 		# Download libs
 		with log.progress("Retrieve libs", "Downloading...") as waiting:
-			with context.silent:
+			with log_silent:
 				try:
 					self.libs_path = handle_path(libcdb.download_libraries(self.path))
 				except requests.RequestException:

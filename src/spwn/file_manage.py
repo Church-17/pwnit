@@ -1,7 +1,6 @@
 import re
 from pathlib import Path
 import shutil
-from pwn import log
 from spwn.utils import ask, choose, run_command
 
 

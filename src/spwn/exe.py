@@ -1,9 +1,9 @@
 from pathlib import Path
 import shutil
-from pwn import log, libcdb, context
+from pwn import libcdb
 from pwnlib.term.text import red, yellow, green
 from spwn.placeholders import EXE_BASENAME
-from spwn.utils import run_command
+from spwn.utils import log, log_silent, run_command
 from spwn.file_manage import recognize_libs, fix_if_exist
 from spwn.binary import Binary
 from spwn.libc import Libc
@@ -35,7 +35,7 @@ class Exe(Binary):
 		if self.runnable_path: return
 		
 		# Check if path is runnable without errors
-		with context.silent:
+		with log_silent:
 			check_error = run_command([path], timeout=0.5)
 		if check_error is None: return
 		
@@ -85,7 +85,7 @@ class Exe(Binary):
 
 					# Handle specific lib
 					if lib == "libc" and libc:
-						with context.silent:
+						with log_silent:
 							try:
 								libcdb.unstrip_libc(str(new_path))
 							except:

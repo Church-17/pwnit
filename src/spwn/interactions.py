@@ -1,5 +1,5 @@
-from pwn import process, context, log
-from spwn.utils import ask
+from pwn import process
+from spwn.utils import log, log_silent, ask
 from spwn.exe import Exe
 
 class Interactions:
@@ -11,7 +11,7 @@ class Interactions:
 
 		# Try autodetect menu recvuntil
 		if exe.runnable_path:
-			with context.silent:
+			with log_silent:
 				tube = process([str(exe.runnable_path)])
 				self.menu_recvuntil = tube.recvrepeat(0.5).strip().split(b" ")[-1].split(b"\n")[-1].decode()
 				tube.close()

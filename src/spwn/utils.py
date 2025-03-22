@@ -1,6 +1,8 @@
 import subprocess
-from pwn import log, options
+from pwn import log, context, options
 from pwnlib.log import Progress, Logger
+
+log_silent = context.silent
 
 
 def ask(prompt: str, can_skip: bool = True) -> str:
