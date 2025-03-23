@@ -1,11 +1,14 @@
 from pathlib import Path
 from spwn.args import Args
 from spwn.config import Config
+from spwn.placeholders import EXE_RELPATH
+from spwn.utils import run_command
 from spwn.file_manage import recognize_exe, recognize_libs
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions
 from spwn.template import create_script
+from spwn.commands import run_custom_commands
 
 def main():
 
@@ -13,9 +16,9 @@ def main():
 	args = Args()
 	config = Config(args)
 
-
 	# List files of cwd
 	cwd_files = list(Path(".").iterdir())
+
 
 	# Recognize exe
 	exe_path = recognize_exe(cwd_files)
@@ -67,5 +70,5 @@ def main():
 		# Create script
 		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
 	
-
-
+	# Run custom command
+	run_custom_commands(config.commands, exe, libc)

@@ -18,6 +18,7 @@ DEFAULT_CONFIG = {
 	"pwntube_variable": "io",
 	"tab": "\t",
 	"script_path": "solve_<exe_basename>.py",
+	"commands": ["ida64.exe", "<exe_relpath>"],
 }
 
 class Config:
@@ -38,6 +39,7 @@ class Config:
 		self.pwntube_variable: str		= actual_config["pwntube_variable"]
 		self.tab: str					= actual_config["tab"]
 		script_path: str | None			= actual_config["script_path"]
+		self.commands: list[str]		= actual_config["commands"]
 
 		# Handle paths
 		self.patch_path: Path | None = handle_path(patch_path)

@@ -18,33 +18,33 @@ def choose(prompt: str, opts: list, default: int | None = None) -> int:
 	return options(prompt, list(map(str, opts)), default)
 
 
-def run_command(args: list, progress_log: Progress | Logger = log, **kwargs) -> str | None:
+def run_command(args: list | str, progress_log: Progress | Logger = log, **kwargs) -> str | None:
 	"""Run a command, logging out failures msg in the progress or in the log"""
 	
-	assert len(args) >= 1
+	assert args
+	cmd = args.split(" ")[0] if isinstance(args, str) else args[0]
 
 	# Try executing command
 	try:
-		cmd_output = subprocess.check_output(args, stderr=subprocess.DEVNULL, encoding="latin-1", **kwargs)
-		return cmd_output
+		return subprocess.check_output(args, stderr=subprocess.DEVNULL, text=True, **kwargs)
 
 	# Handle command not found
 	except FileNotFoundError as err:
-		progress_log.failure(f"To execute this please install {args[0]}")
+		progress_log.failure(f"To execute this please install {cmd}")
 
 	# Handle interrupt
 	except KeyboardInterrupt as err:
-		progress_log.failure(f"{args[0]} interrupted")
+		progress_log.failure(f"{cmd} interrupted")
 
 	# Handle errors
 	except subprocess.CalledProcessError as err:
-		progress_log.failure(f"{args[0]} failed")
+		progress_log.failure(f"{cmd} failed")
 		log.debug(err)
 		log.debug(err.stderr)
 
 	# Handle timeout
 	except subprocess.TimeoutExpired as err:
-		log.debug(f"{args[0]} timeout")
+		log.debug(f"{cmd} timeout")
 		return ""
 
 	return None

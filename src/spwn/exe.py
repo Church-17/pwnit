@@ -117,7 +117,7 @@ class Exe(Binary):
 				loader_path.chmod(0o755)
 				cmd_args += ["--set-interpreter", loader_path]
 			cmd_args += ["--output", patch_path, self.path]
-			cmd_output = run_command(cmd_args, progress=waiting)
+			cmd_output = run_command(cmd_args, progress_log=waiting)
 
 			# Change exe debug path
 			if cmd_output is not None:
@@ -141,7 +141,7 @@ class Exe(Binary):
 
 				# Use seccompt-tools with the runnable exe
 				if self.runnable_path:
-					cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.runnable_path}\' </dev/null >&0 2>&0"], progress=waiting, timeout=timeout)
+					cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.runnable_path}\' </dev/null >&0 2>&0"], progress_log=waiting, timeout=timeout)
 					if cmd_output:
 						waiting.success("Found something")
 						log.info(cmd_output)
@@ -174,6 +174,6 @@ class Exe(Binary):
 		"""Print the possible CWEs"""
 
 		with log.progress("CWE", "Analizing... (Press Ctrl-C to interrupt)") as waiting:
-			cmd_output = run_command(["cwe_checker", self.path], progress=waiting)
+			cmd_output = run_command(["cwe_checker", self.path], progress_log=waiting)
 			if cmd_output:
 				log.info(cmd_output)
