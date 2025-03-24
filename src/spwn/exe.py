@@ -2,7 +2,6 @@ from pathlib import Path
 import shutil
 from pwn import libcdb
 from pwnlib.term.text import red, yellow, green
-from spwn.placeholders import EXE_BASENAME
 from spwn.utils import log, log_silent, run_command
 from spwn.file_manage import recognize_libs, fix_if_exist
 from spwn.binary import Binary
@@ -63,7 +62,8 @@ class Exe(Binary):
 		"""Patch the executable with the given libc"""
 
 		# Handle placeholders
-		patch_path = Path(str(patch_path).replace(EXE_BASENAME, self.path.name))
+		from spwn.placeholders import replace_placeholders
+		patch_path = Path(replace_placeholders(f"{patch_path}", self, libc))
 
 		# Create debug dir
 		debug_dir = fix_if_exist(patch_path.parent)

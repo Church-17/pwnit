@@ -1,3 +1,9 @@
+from typing import overload
+from pathlib import Path
+from spwn.exe import Exe
+from spwn.libc import Libc
+
+
 EXE_BASENAME = "<exe_basename>"
 EXE_RELPATH = "<exe_relpath>"
 EXE_ABSPATH = "<exe_abspath>"
@@ -16,3 +22,45 @@ REMOTE = "<remote>"
 HOST = "<host>"
 PORT = "<port>"
 INTERACTIONS = "<interactions>"
+
+
+def replace_placeholders(
+		text: str,
+		exe: Exe | None = None,
+		libc: Libc | None = None,
+		remote: str | None = None,
+		interactions: str | None = None,
+		use_defaults: bool = True,
+	) -> str | None:
+
+	# Handle host and port from remote
+	host, port = remote.split(":", 1) if remote and ":" in remote else (None, None)
+
+	substitutions: dict[str, tuple[str | None, str]] = {
+		EXE_BASENAME: (exe.path.name if exe else None, "EXE_BASENAME"),
+		EXE_RELPATH: (f"{exe.path.relative_to(Path.cwd(), walk_up=True)}" if exe else None, "EXE_RELPATH"),
+		EXE_ABSPATH: (f"{exe.path.resolve()}" if exe else None, "EXE_ABSPATH"),
+		EXE_DEBUG_BASENAME: (exe.debug_path.name if exe else None, "EXE_DEBUG_BASENAME"),
+		EXE_DEBUG_RELPATH: (f"{exe.debug_path.relative_to(Path.cwd(), walk_up=True)}" if exe else None, "EXE_DEBUG_RELPATH"),
+		EXE_DEBUG_ABSPATH: (f"{exe.debug_path.resolve()}" if exe else None, "EXE_DEBUG_ABSPATH"),
+		LIBC_BASENAME: (libc.path.name if libc else None, "LIBC_BASENAME"),
+		LIBC_RELPATH: (f"{libc.path.relative_to(Path.cwd(), walk_up=True)}" if libc else None, "LIBC_RELPATH"),
+		LIBC_ABSPATH: (f"{libc.path.resolve()}" if libc else None, "LIBC_ABSPATH"),
+		LIBC_DEBUG_BASENAME: (libc.debug_path.name if libc else None, "LIBC_DEBUG_BASENAME"),
+		LIBC_DEBUG_RELPATH: (f"{libc.debug_path.relative_to(Path.cwd(), walk_up=True)}" if libc else None, "LIBC_DEBUG_RELPATH"),
+		LIBC_DEBUG_ABSPATH: (f"{libc.debug_path.resolve()}" if libc else None, "LIBC_DEBUG_ABSPATH"),
+		LIBC_ID: (libc.libc_id if libc and libc.libc_id else None, "LIBC_ID"),
+		LIBC_VERSION: (libc.libc_version if libc and libc.libc_version else None, "LIBC_VERSION"),
+		REMOTE: (remote, "REMOTE"),
+		HOST: (host, "HOST"),
+		PORT: (port, "PORT"),
+		INTERACTIONS: (interactions, ""),
+	}
+
+	for placeholder, (value, default) in substitutions.items():
+		if placeholder in text:
+			if value: text = text.replace(placeholder, value)
+			elif use_defaults: text = text.replace(placeholder, default)
+			else: return None
+
+	return text

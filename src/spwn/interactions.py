@@ -2,6 +2,7 @@ from pwn import process
 from spwn.utils import log, log_silent, ask
 from spwn.exe import Exe
 
+
 class Interactions:
 	def __init__(self, exe: Exe, pwntube_variable: str, tab: str):
 		self.pwntube_variable: str = pwntube_variable

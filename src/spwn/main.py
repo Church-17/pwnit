@@ -1,8 +1,6 @@
 from pathlib import Path
 from spwn.args import Args
 from spwn.config import Config
-from spwn.placeholders import EXE_RELPATH
-from spwn.utils import run_command
 from spwn.file_manage import recognize_exe, recognize_libs
 from spwn.exe import Exe
 from spwn.libc import Libc
@@ -71,4 +69,4 @@ def main():
 		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
 	
 	# Run custom command
-	run_custom_commands(config.commands, exe, libc)
+	run_custom_commands(config.commands, exe, libc, args.remote)
