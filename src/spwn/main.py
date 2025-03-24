@@ -14,12 +14,9 @@ def main():
 	args = Args()
 	config = Config(args)
 
-	# List files of cwd
-	cwd_files = list(Path(".").iterdir())
-
 
 	# Recognize exe
-	exe_path = recognize_exe(cwd_files)
+	exe_path = recognize_exe(Path(".").iterdir())
 	if exe_path:
 		exe_path.chmod(0o755)
 		exe = Exe(exe_path)
@@ -29,11 +26,11 @@ def main():
 
 	# Recognize libs
 	if (not exe) or (not exe.statically_linked):
-		cwd_libs = recognize_libs(cwd_files)
+		libs = recognize_libs(Path(exe.runpath.decode() if exe and exe.runpath else ".").iterdir())
 
 		# Recognize libc
-		if "libc" in cwd_libs:
-			libc = Libc(cwd_libs["libc"])
+		if "libc" in libs:
+			libc = Libc(libs["libc"])
 
 			# Download libc source
 			if config.download_libc_source: libc.download_source()
@@ -42,7 +39,7 @@ def main():
 		else:
 			libc = None
 	else:
-		cwd_libs = {}
+		libs = {}
 		libc = None
 
 
@@ -52,7 +49,7 @@ def main():
 		exe.check_functions(config.check_functions)
 
 		# Patch
-		if config.patch_path and (not exe.statically_linked): exe.patch(config.patch_path, cwd_libs, libc)
+		if config.patch_path and (not exe.statically_linked) and (not exe.runpath): exe.patch(config.patch_path, libs, libc)
 
 		# Analyze
 		if config.seccomp: exe.seccomp()
@@ -62,6 +59,7 @@ def main():
 
 
 	if config.template_path:
+
 		# Interactions
 		interactions = Interactions(exe, config.pwntube_variable, config.tab) if config.interactions and exe else None
 		
