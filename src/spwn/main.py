@@ -24,23 +24,17 @@ def main():
 		exe = None
 
 
-	# Recognize libs
+	# Recognize libc
+	libc = None
 	if (not exe) or (not exe.statically_linked):
-		libs = recognize_libs(Path(exe.runpath.decode() if exe and exe.runpath else ".").iterdir())
-
-		# Recognize libc
-		if "libc" in libs:
-			libc = Libc(libs["libc"])
+		libcs = recognize_libs(Path(exe.runpath.decode() if exe and exe.runpath else ".").iterdir(), ["libc"])
+		if "libc" in libcs:
+			libc = Libc(libcs["libc"])
 
 			# Download libc source
 			if config.download_libc_source: libc.download_source()
 
 			print()
-		else:
-			libc = None
-	else:
-		libs = {}
-		libc = None
 
 
 	if exe:
@@ -49,7 +43,7 @@ def main():
 		exe.check_functions(config.check_functions)
 
 		# Patch
-		if config.patch_path and (not exe.statically_linked) and (not exe.runpath): exe.patch(config.patch_path, libs, libc)
+		if config.patch_path and (not exe.statically_linked) and (not exe.runpath): exe.patch(config.patch_path, libc)
 
 		# Analyze
 		if config.seccomp: exe.seccomp()

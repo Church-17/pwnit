@@ -55,10 +55,10 @@ class Exe(Binary):
 
 		found_functions = [red(f) for f in check_functions if f in self.sym]
 		if found_functions:
-			log.success(f"There are some dangerous functions: {', '.join(found_functions)}")
+			log.success(f"Interesting functions: {', '.join(found_functions)}")
 
 
-	def patch(self, patch_path: Path, cwd_libs: dict[str, Path], libc: Libc | None) -> None:
+	def patch(self, patch_path: Path, libc: Libc | None) -> None:
 		"""Patch the executable with the given libc"""
 
 		# Handle placeholders
@@ -77,22 +77,21 @@ class Exe(Binary):
 			loader_path = None
 
 			# Copy the libs from cwd
-			for lib, file in cwd_libs.items():
-				if lib in required_libs_dict:
-					new_path = debug_dir / required_libs_dict[lib]
-					shutil.copy2(file, new_path)
-					required_libs_dict.pop(lib)
+			for lib, file in recognize_libs(Path(".").iterdir(), required_libs_dict.keys()).items():
+				new_path = debug_dir / required_libs_dict[lib]
+				shutil.copy2(file, new_path)
+				required_libs_dict.pop(lib)
 
-					# Handle specific lib
-					if lib == "libc" and libc:
-						with log_silent:
-							try:
-								libcdb.unstrip_libc(str(new_path))
-							except:
-								pass
-						libc.debug_path = new_path.resolve()
-					elif lib == "ld":
-						loader_path = new_path
+				# Handle specific lib
+				if lib == "libc" and libc:
+					with log_silent:
+						try:
+							libcdb.unstrip_libc(str(new_path))
+						except:
+							pass
+					libc.debug_path = new_path.resolve()
+				elif lib == "ld":
+					loader_path = new_path
 
 			# Copy libs from downloaded libs
 			if libc and libc.libs_path:
