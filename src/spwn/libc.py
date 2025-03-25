@@ -1,7 +1,6 @@
 from pathlib import Path
 import re
 import tarfile
-from urllib.parse import urlparse
 import requests
 from pwn import libcdb
 from spwn.utils import log, log_silent
@@ -76,7 +75,7 @@ class Libc(Binary):
 			if not response:
 				waiting.failure(f"Download from {url} failed")
 				return None
-			archive_path = Path(f"/tmp/{urlparse(url).path.rsplit("/", 1)[-1]}")
+			archive_path = Path(f"/tmp/glibc-{self.libc_version}.tar.gz")
 			archive_path.write_bytes(response.content)
 
 			# Extract archive
