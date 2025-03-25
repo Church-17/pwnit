@@ -19,6 +19,6 @@ def run_custom_commands(
 		# Run command
 		output = run_command(new_cmd, shell=True)
 		if output is not None:
-			log.success(f"\"{new_cmd}\" executed")
+			log.success(f"`{new_cmd}` executed")
 			if output:
 				log.info(output)
