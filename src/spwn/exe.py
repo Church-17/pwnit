@@ -71,7 +71,7 @@ class Exe(Binary):
 		debug_dir.mkdir(parents=True)
 		patch_path = debug_dir / patch_path.name
 
-		with log.progress("Patch", "Copying and unstripping libs...") as waiting:
+		with log.progress("Patch", "Copying and unstripping libs...") as progress:
 
 			# Get libs names of the required libs
 			required_libs_dict = recognize_libs({Path(lib) for lib in self.required_libs})
@@ -111,13 +111,13 @@ class Exe(Binary):
 				log.warning(f"Missing libs for patch: {', '.join([yellow(str(lib)) for lib in required_libs_dict.values()])}")
 
 			# Run patchelf
-			waiting.status("Run patchelf...")
+			progress.status("Run patchelf...")
 			cmd_args = ["patchelf", "--set-rpath", debug_dir]
 			if loader_path:
 				loader_path.chmod(0o755)
 				cmd_args += ["--set-interpreter", loader_path]
 			cmd_args += ["--output", patch_path, self.path]
-			cmd_output = run_command(cmd_args, progress_log=waiting)
+			cmd_output = run_command(cmd_args, progress_log=progress)
 
 			# Change exe debug path
 			if cmd_output is not None:
@@ -137,18 +137,18 @@ class Exe(Binary):
 
 		# Check if exists a seccomp function
 		if ("prctl" in self.sym) or any(True for function in self.sym if function.startswith("seccomp")):
-			with log.progress("Seccomp", "Potential seccomp detected, analyzing...") as waiting:
+			with log.progress("Seccomp", "Potential seccomp detected, analyzing...") as progress:
 
 				# Use seccompt-tools with the runnable exe
 				if self.runnable_path:
-					cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.runnable_path}\' </dev/null >&0 2>&0"], progress_log=waiting, timeout=timeout)
+					cmd_output = run_command(["seccomp-tools", "dump", f"\'{self.runnable_path}\' </dev/null >&0 2>&0"], progress_log=progress, timeout=timeout)
 					if cmd_output:
-						waiting.success("Found something")
+						progress.success("Found something")
 						log.info(cmd_output)
 					else:
-						waiting.success("Not found anything")
+						progress.success("Not found anything")
 				else:
-					waiting.failure("The executable cannot run")
+					progress.failure("The executable cannot run")
 
 
 	def yara(self, yara_rules: Path) -> None:
@@ -173,7 +173,7 @@ class Exe(Binary):
 	def cwe(self) -> None:
 		"""Print the possible CWEs"""
 
-		with log.progress("CWE", "Analizing... (Press Ctrl-C to interrupt)") as waiting:
-			cmd_output = run_command(["cwe_checker", self.path], progress_log=waiting)
+		with log.progress("CWE", "Analizing... (Press Ctrl-C to interrupt)") as progress:
+			cmd_output = run_command(["cwe_checker", self.path], progress_log=progress)
 			if cmd_output:
 				log.info(cmd_output)

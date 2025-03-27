@@ -13,7 +13,7 @@ class Libc(Binary):
 		super().__init__(filepath)
 
 		# Retrieve libc id
-		with log.progress("Libc version", "Retrieving libc ID from libc.rip...") as waiting:
+		with log.progress("Libc version", "Retrieving libc ID from libc.rip...") as progress:
 			with log_silent:
 				libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
 			if libc_matches:
@@ -26,7 +26,7 @@ class Libc(Binary):
 
 			else:
 				self.libc_id = None
-				waiting.status("Failed to retrieve libc ID from libc.rip, retrieving version from file...")
+				progress.status("Failed to retrieve libc ID from libc.rip, retrieving version from file...")
 				if libc_matches == []:
 					log.warning(f"Recognized libc is not a standard libc")
 
@@ -36,51 +36,51 @@ class Libc(Binary):
 					self.libc_version = match.group(1).decode()
 				else:
 					self.libc_version = None
-					waiting.failure("Failed to retrieve libc version")
+					progress.failure("Failed to retrieve libc version")
 
 			# Print libc version and id
 			if self.libc_version:
-				waiting.success(f"{self.libc_version}" + (f" ({self.libc_id})" if self.libc_id else ""))
+				progress.success(f"{self.libc_version}" + (f" ({self.libc_id})" if self.libc_id else ""))
 
 		# Download libs
-		with log.progress("Retrieve libs", "Downloading...") as waiting:
+		with log.progress("Retrieve libs", "Downloading...") as progress:
 			with log_silent:
 				try:
 					self.libs_path = handle_path(libcdb.download_libraries(self.path))
 				except requests.RequestException:
 					self.libs_path = None
 			if self.libs_path:
-				waiting.success(f"Done ({self.libs_path})")
+				progress.success(f"Done ({self.libs_path})")
 			else:
-				waiting.failure("Failed to download libs")
+				progress.failure("Failed to download libs")
 
 
 	def download_source(self, dirpath: Path = Path.cwd()) -> None:
 		"""Download the source code of this libc version"""
 
-		with log.progress("Libc source") as waiting:
+		with log.progress("Libc source") as progress:
 
 			# Get numeric libc version
 			if not self.libc_version:
-				waiting.failure("Libc version absent")
+				progress.failure("Libc version absent")
 				return
 
 			# Get libc source archive
 			url = f"http://ftpmirror.gnu.org/gnu/libc/glibc-{self.libc_version}.tar.gz"
-			waiting.status(f"Downloading from {url}...")
+			progress.status(f"Downloading from {url}...")
 			try:
 				response = requests.get(url)
 			except requests.RequestException:
 				response = None
 			if not response:
-				waiting.failure(f"Download from {url} failed")
+				progress.failure(f"Download from {url} failed")
 				return None
 			archive_path = Path(f"/tmp/glibc-{self.libc_version}.tar.gz")
 			archive_path.write_bytes(response.content)
 
 			# Extract archive
-			waiting.status("Extracting...")
+			progress.status("Extracting...")
 			with tarfile.open(archive_path, "r:gz") as tar:
 				tar.extractall(dirpath)
 
-			waiting.success()
+			progress.success()
