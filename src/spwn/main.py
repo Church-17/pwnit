@@ -16,34 +16,31 @@ def main():
 
 
 	# Recognize exe
+	exe = None
 	exe_path = recognize_exe(Path(".").iterdir())
 	if exe_path:
-		exe_path.chmod(0o755)
 		exe = Exe(exe_path)
-	else:
-		exe = None
-
 
 	# Recognize libc
 	libc = None
-	if (not exe) or (not exe.statically_linked):
-		libcs = recognize_libs(Path(exe.runpath.decode() if exe and exe.runpath else ".").iterdir(), ["libc"])
+	if not (exe and exe.statically_linked):
+		libcs = recognize_libs(Path(exe.runpath.decode() if (exe and exe.runpath) else ".").iterdir(), ["libc"])
 		if "libc" in libcs:
 			libc = Libc(libcs["libc"])
 
-			# Download libc source
-			if config.download_libc_source: libc.download_source()
-
-			print()
+	print()
 
 
 	if exe:
+
 		# Describe
 		exe.describe()
 		exe.check_functions(config.check_functions)
+		print()
 
 		# Patch
 		if config.patch_path and (not exe.statically_linked) and (not exe.runpath): exe.patch(config.patch_path, libc)
+		print()
 
 		# Analyze
 		if config.seccomp: exe.seccomp()
@@ -52,13 +49,21 @@ def main():
 		print()
 
 
+	if libc:
+
+		# Download libc source
+		if config.download_libc_source: libc.download_source()
+		print()
+
+
 	if config.template_path:
 
 		# Interactions
 		interactions = Interactions(exe, config.pwntube_variable, config.tab) if config.interactions and exe else None
-		
+
 		# Create script
 		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
-	
+
+
 	# Run custom command
 	run_custom_commands(config.commands, exe, libc, args.remote)
