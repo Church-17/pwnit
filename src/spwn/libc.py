@@ -9,7 +9,7 @@ from spwn.binary import Binary
 
 
 class Libc(Binary):
-	def __init__(self, filepath: Path):
+	def __init__(self, filepath: Path) -> None:
 		super().__init__(filepath)
 
 		# Retrieve libc id
