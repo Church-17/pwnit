@@ -28,9 +28,6 @@ def main():
 		if "libc" in libcs:
 			libc = Libc(libcs["libc"])
 
-		# Download libc source
-		if config.download_libc_source: libc.download_source()
-
 	print()
 
 
@@ -48,6 +45,14 @@ def main():
 		if config.yara_rules: exe.yara(config.yara_rules)
 		if config.cwe: exe.cwe()
 	
+		print()
+
+
+	if libc:
+
+		# Download libc source
+		if config.download_libc_source: libc.download_source()
+
 		print()
 
 
