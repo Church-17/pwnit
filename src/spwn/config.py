@@ -4,15 +4,15 @@ import requests
 from spwn.file_manage import handle_path, check_file, check_dir
 from spwn.args import Args
 
-CONFIG_DIR_PATH = Path("~/.config/spwn/").expanduser()
+CONFIG_DIR_PATH = handle_path("~/.config/spwn/")
 CONFIG_FILEPATH = CONFIG_DIR_PATH / "config.json"
 DEFAULT_CONFIG = {
-	"download_libc_source": False,
 	"check_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
 	"patch_path": "./debug/<exe_basename>_patched",
 	"seccomp": True,
 	"yara_rules": str(CONFIG_DIR_PATH / "findcrypt3.rules"),
 	"cwe": False,
+	"download_libc_source": False,
 	"template_path": str(CONFIG_DIR_PATH / "template.py"),
 	"interactions": False,
 	"pwntube_variable": "io",
@@ -28,12 +28,12 @@ class Config:
 		actual_config = self.read_config_file()
 
 		# Set config variables
-		self.download_libc_source: bool	= args.source or actual_config["download_libc_source"]
 		self.check_functions: list[str] = actual_config["check_functions"]
 		patch_path: str | None			= args.patch or actual_config["patch_path"]
 		self.seccomp: bool				= args.seccomp or actual_config["seccomp"]
 		yara_rules: str | None			= args.yara or actual_config["yara_rules"]
 		self.cwe: bool					= args.cwe or actual_config["cwe"]
+		self.download_libc_source: bool	= args.libc_source or actual_config["download_libc_source"]
 		template_path: str | None		= args.template or actual_config["template_path"]
 		self.interactions: bool			= args.interactions or actual_config["interactions"]
 		self.pwntube_variable: str		= actual_config["pwntube_variable"]
@@ -51,11 +51,11 @@ class Config:
 
 		# Handle only mode
 		if args.only:
-			if not args.source: self.download_libc_source = False
 			if not args.patch: self.patch_path = None
 			if not args.seccomp: self.seccomp = False
 			if not args.yara: self.yara_rules = None
 			if not args.cwe: self.cwe = False
+			if not args.libc_source: self.download_libc_source = False
 			if not args.interactions and not args.template: self.template_path = None
 			if not args.interactions: self.interactions = False
 

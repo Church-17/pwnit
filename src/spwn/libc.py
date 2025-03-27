@@ -4,13 +4,14 @@ import tarfile
 import requests
 from pwn import libcdb
 from spwn.utils import log, log_silent
-from spwn.file_manage import handle_path
+from spwn.file_manage import handle_path, check_dir
 from spwn.binary import Binary
 
 
 class Libc(Binary):
 	def __init__(self, filepath: Path) -> None:
 		super().__init__(filepath)
+		self.source_path: Path | None = None
 
 		# Retrieve libc id
 		with log.progress("Libc version", "Retrieving libc ID from libc.rip...") as progress:
@@ -55,32 +56,46 @@ class Libc(Binary):
 				progress.failure("Failed to download libs")
 
 
-	def download_source(self, dirpath: Path = Path.cwd()) -> None:
+	def download_source(self) -> None:
 		"""Download the source code of this libc version"""
 
 		with log.progress("Libc source") as progress:
 
-			# Get numeric libc version
+			# Check numeric libc version
 			if not self.libc_version:
 				progress.failure("Libc version absent")
 				return
+			
+			# Handle cache dir
+			cache_dir = Path("~/.cache/spwn").expanduser()
+			if not check_dir(cache_dir):
+				cache_dir.mkdir()
 
-			# Get libc source archive
-			url = f"http://ftpmirror.gnu.org/gnu/libc/glibc-{self.libc_version}.tar.gz"
-			progress.status(f"Downloading from {url}...")
-			try:
-				response = requests.get(url)
-			except requests.RequestException:
-				response = None
-			if not response:
-				progress.failure(f"Download from {url} failed")
-				return None
-			archive_path = Path(f"/tmp/glibc-{self.libc_version}.tar.gz")
-			archive_path.write_bytes(response.content)
+			# Check cached libc sources
+			source_dirname = f"glibc-{self.libc_version}"
+			for cached_source in cache_dir.iterdir():
+				if source_dirname == cached_source.name:
+					break
 
-			# Extract archive
-			progress.status("Extracting...")
-			with tarfile.open(archive_path, "r:gz") as tar:
-				tar.extractall(dirpath)
+			else:
+				# Get libc source archive
+				url = f"http://ftpmirror.gnu.org/gnu/libc/{source_dirname}.tar.gz"
+				progress.status(f"Downloading from {url}...")
+				try:
+					response = requests.get(url)
+				except requests.RequestException:
+					response = None
+				if not response:
+					progress.failure(f"Download from {url} failed")
+					return None
+				archive_path = Path(f"/tmp/{source_dirname}.tar.gz")
+				archive_path.write_bytes(response.content)
 
-			progress.success()
+				# Extract archive
+				progress.status("Extracting...")
+				with tarfile.open(archive_path, "r:gz") as tar:
+					tar.extractall(cache_dir)
+
+			# Return libc source
+			self.source_path = cache_dir / source_dirname
+			progress.success(f"{self.source_path}")

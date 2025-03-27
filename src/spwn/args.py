@@ -7,7 +7,7 @@ class Args:
 		self.interactions: bool		= args["interactions"]
 		self.template: str | None	= args["template"]
 		self.only: bool				= args["only"]
-		self.source: bool			= args["source"]
+		self.libc_source: bool		= args["libc_source"]
 		self.patch: str | None		= args["patch"]
 		self.seccomp: bool			= args["seccomp"]
 		self.yara: str | None		= args["yara"]
@@ -40,7 +40,7 @@ class Args:
 			action="store_true",
 		)
 		parser.add_argument(
-			"--source",
+			"--libc-source",
 			help="Donwload the libc source",
 			action="store_true",
 		)

@@ -18,6 +18,7 @@ LIBC_DEBUG_RELPATH = "<libc_debug_relpath>"
 LIBC_DEBUG_ABSPATH = "<libc_debug_abspath>"
 LIBC_ID = "<libc_id>"
 LIBC_VERSION = "<libc_version>"
+LIBC_SOURCE_PATH = "<libc_source_path>"
 REMOTE = "<remote>"
 HOST = "<host>"
 PORT = "<port>"
@@ -51,6 +52,7 @@ def replace_placeholders(
 		LIBC_DEBUG_ABSPATH: (f"{libc.debug_path.resolve()}" if libc else None, "LIBC_DEBUG_ABSPATH"),
 		LIBC_ID: (libc.libc_id if libc and libc.libc_id else None, "LIBC_ID"),
 		LIBC_VERSION: (libc.libc_version if libc and libc.libc_version else None, "LIBC_VERSION"),
+		LIBC_SOURCE_PATH: (f"{libc.source_path}" if libc and libc.source_path else None, "LIBC_SOURCE_PATH"),
 		REMOTE: (remote, "REMOTE"),
 		HOST: (host, "HOST"),
 		PORT: (port, "PORT"),
