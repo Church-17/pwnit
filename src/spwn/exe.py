@@ -11,6 +11,7 @@ from spwn.libc import Libc
 class Exe(Binary):
 	def __init__(self, filepath: Path) -> None:
 		super().__init__(filepath)
+		self.path.chmod(0o755)
 		self.runnable_path: Path | None = None
 		self.set_runnable_path(self.path)
 
