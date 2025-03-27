@@ -28,6 +28,9 @@ def main():
 		if "libc" in libcs:
 			libc = Libc(libcs["libc"])
 
+		# Download libc source
+		if config.download_libc_source: libc.download_source()
+
 	print()
 
 
@@ -36,23 +39,15 @@ def main():
 		# Describe
 		exe.describe()
 		exe.check_functions(config.check_functions)
-		print()
 
 		# Patch
 		if config.patch_path and (not exe.statically_linked) and (not exe.runpath): exe.patch(config.patch_path, libc)
-		print()
 
 		# Analyze
 		if config.seccomp: exe.seccomp()
 		if config.yara_rules: exe.yara(config.yara_rules)
 		if config.cwe: exe.cwe()
-		print()
-
-
-	if libc:
-
-		# Download libc source
-		if config.download_libc_source: libc.download_source()
+	
 		print()
 
 
@@ -63,6 +58,8 @@ def main():
 
 		# Create script
 		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
+
+		print()
 
 
 	# Run custom command
