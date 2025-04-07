@@ -1,4 +1,3 @@
-from pathlib import Path
 from spwn.file_manage import relative_path
 from spwn.exe import Exe
 from spwn.libc import Libc
