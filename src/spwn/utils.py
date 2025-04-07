@@ -1,13 +1,14 @@
 import subprocess
 from pwn import log, context, options
 from pwnlib.log import Progress, Logger
+from pwnlib.term.text import yellow
 
 log_silent = context.silent
 
 
 def ask(prompt: str, can_skip: bool = True) -> str:
 	while True:
-		received = input(f" [?] {prompt} > ")
+		received = input(f" [{yellow("?")}] {prompt} > ")
 		if received or can_skip: return received
 		log.warning("Can't skip")
 
