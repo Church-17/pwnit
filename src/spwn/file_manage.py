@@ -56,6 +56,10 @@ def handle_path(path: str | None) -> Path | None:
 	return Path(path).expanduser() if path else None
 
 
+def relative_path(path: Path) -> Path:
+	return path.relative_to(Path.cwd()) if path.is_relative_to(Path.cwd()) else path
+
+
 def check_file(path: Path) -> bool:
 	if not path.is_file():
 		if path.exists():
