@@ -8,7 +8,6 @@ dynamic = ["version"]
 name = "spwn"
 description = "Automatic tool to quickly start a pwn CTF challenge"
 authors = [
-	{name="Chino"},
 	{name="Matteo Chiesa", email="matteo.chiesa.mc@gmail.com"}
 ]
 maintainers = [
