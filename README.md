@@ -44,12 +44,12 @@ If the files have weird names (such as the libc name not starting with "libc"), 
 To understand how the interactions creation works, I suggest to just try it out. It should be pretty straight forward, but if you want to pwn as fast as possible, you cannot waste any time :)
 
 ## Installation
-Non python tools:
+This tool requires this packages:
 ```bash
 sudo apt update
 sudo apt install patchelf elfutils ruby-rubygems
 # Or the equivalent for you package manager
-sudo gem install seccomp-tools  # Might not need `sudo`
+
+sudo gem install seccomp-tools
 ```
-To install [cwe_checker](https://github.com/fkie-cad/cwe_checker)
-follow the instructions in their repository.
+To install `cwe_checker` follow the instructions in [their repository](https://github.com/fkie-cad/cwe_checker).
