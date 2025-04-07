@@ -18,7 +18,7 @@ DEFAULT_CONFIG = {
 	"pwntube_variable": "io",
 	"tab": "\t",
 	"script_path": "solve_<exe_basename>.py",
-	"commands": ["ida64.exe", "<exe_relpath>"],
+	"commands": [],
 }
 
 class Config:
