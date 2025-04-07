@@ -31,6 +31,7 @@ def main():
 	print()
 
 
+	# Do with exe
 	if exe:
 
 		# Describe
@@ -48,6 +49,7 @@ def main():
 		print()
 
 
+	# Do with libc
 	if libc:
 
 		# Download libc source
@@ -56,6 +58,7 @@ def main():
 		print()
 
 
+	# Do with template
 	if config.template_path:
 
 		# Interactions
@@ -67,5 +70,5 @@ def main():
 		print()
 
 
-	# Run custom command
+	# Run custom commands
 	run_custom_commands(config.commands, exe, libc, args.remote)
