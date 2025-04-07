@@ -32,7 +32,7 @@ options:
   -t TEMPLATE, --template TEMPLATE
                         Create the script from the template
   -o, --only            Do only the actions specified in args
-  --source              Donwload the libc source
+  --libc-source         Donwload the libc source
   --patch PATCH         Patch the executable with the specified path
   --seccomp             Check seccomp
   --yara YARA           Check for given Yara rules
