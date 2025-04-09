@@ -72,15 +72,17 @@ class Config:
 			# Write default config file
 			CONFIG_FILEPATH.write_text(json.dumps(DEFAULT_CONFIG, indent='\t'))
 
-			# If default yara rules file doesn't exists, download it
-			YARA_RULES = handle_path(DEFAULT_CONFIG["yara_rules"])
-			if YARA_RULES and not check_file(YARA_RULES):
-				try:
-					response = requests.get("https://raw.githubusercontent.com/polymorf/findcrypt-yara/master/findcrypt3.rules")
-				except:
-					response = None
-				if response:
-					YARA_RULES.write_text(response.text)
+			# Try to download missing config files
+			def download_config_file(key: str, url: str):
+				yara_rules = handle_path(DEFAULT_CONFIG[key])
+				if yara_rules and not check_file(yara_rules):
+					try:
+						response = requests.get(url)
+						yara_rules.write_text(response.text)
+					except:
+						pass
+			download_config_file("yara_rules", "https://raw.githubusercontent.com/polymorf/findcrypt-yara/master/findcrypt3.rules")
+			download_config_file("template_path", "https://raw.githubusercontent.com/Church-17/spwn/master/resources/template.py")
 
 			actual_config = DEFAULT_CONFIG
 		
