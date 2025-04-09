@@ -1,3 +1,5 @@
+import re
+
 class Args:
 	def __init__(self) -> None:
 
@@ -13,6 +15,9 @@ class Args:
 		self.yara: str | None		= args["yara"]
 		self.cwe: bool				= args["cwe"]
 
+		if self.remote: assert re.search(r"^[^\:]+\:\d+$", self.remote), "Remote parameter without the correct syntax '<host>:<port>'"
+
+
 	def parse_args(self) -> dict[str]:
 		"""Parse the arguments given to the command into a dict"""
 
@@ -23,7 +28,7 @@ class Args:
 		)
 		parser.add_argument(
 			"-r", "--remote",
-			help="Specify the host:port",
+			help="Specify <host>:<port>",
 		)
 		parser.add_argument(
 			"-i", "--interactions",
