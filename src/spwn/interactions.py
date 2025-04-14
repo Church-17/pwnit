@@ -54,12 +54,19 @@ class InteractionFunction:
 			self.arguments.append(Argument(argument_name, argument_sendafter))
 
 	def dump(self, pwntube_variable: str, menu_recvuntil: str, tab: str):
-		result = "\n".join([
-			f'def {self.name}({", ".join(arg.name for arg in self.arguments)}):',
-			f'{tab}{pwntube_variable}.sendlineafter(b"{menu_recvuntil}", b"{self.send_to_select}")',
-		] + [
-			f'{tab}{pwntube_variable}.sendlineafter(b"{arg.sendafter}", {arg.name} if isinstance({arg.name}, bytes) else str({arg.name}).encode())'
+		arguments = ", ".join(arg.name for arg in self.arguments)
+		menu_recvuntil = menu_recvuntil.replace("\"", "\\\"")
+		send_to_select = self.send_to_select.replace("\"", "\\\"")
+		send_args = [
+			f'{tab}{pwntube_variable}.sendlineafter('
+			f'b\"{arg.sendafter.replace("\"", "\\\"")}\", '
+			f'{arg.name} if isinstance({arg.name}, bytes) else str({arg.name}).encode())'
 			for arg in self.arguments
+		]
+		result = "\n".join([
+			f'def {self.name}({arguments}):',
+			f'{tab}{pwntube_variable}.sendlineafter(b\"{menu_recvuntil}\", b\"{send_to_select}\")',
+			*send_args,
 		])
 		return result
 
