@@ -13,9 +13,8 @@ class Interactions:
 		# Try autodetect menu recvuntil
 		if exe.runnable_path:
 			with log_silent:
-				tube = process([str(exe.runnable_path)])
-				self.menu_recvuntil = tube.recvrepeat(0.5).strip().split(b" ")[-1].split(b"\n")[-1].decode()
-				tube.close()
+				with process([str(exe.runnable_path)]) as tube:
+					self.menu_recvuntil = tube.recvrepeat(0.5).strip().split(b" ")[-1].split(b"\n")[-1].decode()
 		
 		# Menu recvuntil
 		if self.menu_recvuntil:
@@ -31,7 +30,7 @@ class Interactions:
 			self.functions.append(InteractionFunction(function_name))
 
 	def dump(self, tab_placeholder: str):
-		result = f"\n\n{tab_placeholder}".join([
+		result = "\n" + f"\n\n{tab_placeholder}".join([
 			func.dump(self.pwntube_variable, self.menu_recvuntil, tab_placeholder+self.tab)
 			for func in self.functions
 		])

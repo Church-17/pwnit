@@ -26,7 +26,7 @@ def create_script(
 	template_content = template.read_text()
 
 	# Search of tabs before interactions
-	match = re.search(rf"([ \t]*){INTERACTIONS}", template_content)
+	match = re.search(rf"([ \t]*)(\#[ \t]*)?{INTERACTIONS}", template_content)
 	tab_interactions_placeholder: str = match.group(1) if match else ""
 
 	# Replace placeholders
