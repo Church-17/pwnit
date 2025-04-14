@@ -165,9 +165,11 @@ class Exe(Binary):
 		matches = rules.match(str(self.path))
 		if matches:
 			log.success("Yara found something:")
+			matches_str = []
 			for match in matches:
 				addresses = [instance.offset for string_match in match.strings for instance in string_match.instances]
-				log.info(f'{match.rule} at {", ".join(map(hex, addresses))}')
+				matches_str.append(f'{match.rule} at {", ".join(map(hex, addresses))}')
+			log.info("\n".join(matches_str))
 
 
 	def cwe(self) -> None:
