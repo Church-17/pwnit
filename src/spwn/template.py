@@ -1,15 +1,15 @@
 from pathlib import Path
 import re
 from spwn.utils import log
-from spwn.file_manage import fix_if_exist
+from spwn.file_manage import fix_if_exist, check_file
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions
-from spwn.placeholders import INTERACTIONS, replace_placeholders
+from spwn.placeholders import replace_placeholders
 
 
 def create_script(
-		template: Path,
+		template_path: Path,
 		script: Path,
 		remote: str | None = None,
 		exe: Exe | None = None,
@@ -18,20 +18,24 @@ def create_script(
 	) -> None:
 
 	# Check template file
-	if not template.is_file():
+	if not template_path.is_file():
 		log.failure("Template file doesn't exists. A new script will not be created")
 		return
 
-	# Read template file
-	template_content = template.read_text()
+	# Handle placeholders in script path
+	script_path = Path(replace_placeholders(f"{script}", exe, libc, remote))
 
-	# Search of tabs before interactions
-	match = re.search(rf"([ \t]*)(\#[ \t]*)?{INTERACTIONS}", template_content)
+	# Read template file (or script file if already exists)
+	content = script_path.read_text() if check_file(script_path) else template_path.read_text()
+
+	# Search for spaces before interactions
+	match = re.search(r"([ \t]*)(?:#[ \t]*)?<interactions(?:(:)(.*?))?>", content)
 	tab_interactions_placeholder: str = match.group(1) if match else ""
+	print(tab_interactions_placeholder.encode())
 
 	# Replace placeholders
 	new_content = replace_placeholders(
-		template_content,
+		content,
 		exe,
 		libc,
 		remote,
@@ -39,6 +43,5 @@ def create_script(
 	)
 
 	# Write new script
-	script = fix_if_exist(Path(replace_placeholders(f"{script}", exe, libc, remote)))
-	script.write_text(new_content)
-	log.success(f"Script \'{script}\' created")
+	script_path.write_text(new_content)
+	log.success(f"Script \'{script}\' updated")

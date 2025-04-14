@@ -13,7 +13,7 @@ def run_custom_commands(
 	for cmd in commands:
 
 		# Handle placeholders in commands (skip if a placeholder can't be substitute)
-		new_cmd = replace_placeholders(cmd, exe, libc, remote, use_defaults=False)
+		new_cmd = replace_placeholders(cmd, exe, libc, remote, keep_missing=False)
 		if not new_cmd: continue
 
 		# Run command

@@ -30,8 +30,8 @@ class Interactions:
 			self.functions.append(InteractionFunction(function_name))
 
 	def dump(self, tab_placeholder: str):
-		result = "\n" + f"\n\n{tab_placeholder}".join([
-			func.dump(self.pwntube_variable, self.menu_recvuntil, tab_placeholder+self.tab)
+		result = "".join([
+			f"\n{tab_placeholder}{func.dump(self.pwntube_variable, self.menu_recvuntil, tab_placeholder+self.tab)}\n"
 			for func in self.functions
 		])
 		return result
