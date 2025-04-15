@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 from spwn.utils import log
-from spwn.file_manage import fix_if_exist, check_file
+from spwn.file_manage import check_file
 from spwn.exe import Exe
 from spwn.libc import Libc
 from spwn.interactions import Interactions
@@ -10,7 +10,7 @@ from spwn.placeholders import replace_placeholders
 
 def create_script(
 		template_path: Path,
-		script: Path,
+		script_path: Path,
 		remote: str | None = None,
 		exe: Exe | None = None,
 		libc: Libc | None = None,
@@ -23,7 +23,7 @@ def create_script(
 		return
 
 	# Handle placeholders in script path
-	script_path = Path(replace_placeholders(f"{script}", exe, libc, remote))
+	script_path = Path(replace_placeholders(f"{script_path}", exe, libc, remote))
 
 	# Read template file (or script file if already exists)
 	content = script_path.read_text() if check_file(script_path) else template_path.read_text()
@@ -43,4 +43,4 @@ def create_script(
 
 	# Write new script
 	script_path.write_text(new_content)
-	log.success(f"Script \'{script}\' updated")
+	log.success(f"Script \'{script_path}\' updated")
