@@ -17,16 +17,17 @@ def create_script(
 		interactions: Interactions | None = None,
 	) -> None:
 
-	# Check template file
-	if not template_path.is_file():
-		log.failure("Template file doesn't exists. A new script will not be created")
-		return
-
 	# Handle placeholders in script path
 	script_path = Path(replace_placeholders(f"{script_path}", exe, libc, remote))
 
 	# Read template file (or script file if already exists)
-	content = script_path.read_text() if check_file(script_path) else template_path.read_text()
+	if check_file(script_path):
+		content = script_path.read_text()
+	elif check_file(template_path):
+		content = template_path.read_text()
+	else:
+		log.failure("There is neither a template file nor a script file. A new script will not be created")
+		return
 
 	# Search for spaces before interactions
 	match = re.search(r"([ \t]*)(?:#[ \t]*)?<interactions(?:(:)(.*?))?>", content)
