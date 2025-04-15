@@ -31,7 +31,6 @@ def create_script(
 	# Search for spaces before interactions
 	match = re.search(r"([ \t]*)(?:#[ \t]*)?<interactions(?:(:)(.*?))?>", content)
 	tab_interactions_placeholder: str = match.group(1) if match else ""
-	print(tab_interactions_placeholder.encode())
 
 	# Replace placeholders
 	new_content = replace_placeholders(
