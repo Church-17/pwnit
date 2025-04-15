@@ -48,6 +48,6 @@ def replace_placeholders(
 			elif not keep_missing: missing = True
 		return re_match.group(0)
 
-	text = re.sub(r"<(.+?)(?:(:)(.*?))?>", substitute, text)
+	text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
 	if missing: return None
 	return text
