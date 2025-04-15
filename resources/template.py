@@ -1,6 +1,7 @@
 from pwn import *
 
-binary_name = "<exe_relpath>"
+use_patched = False
+binary_name = "<exe_relpath>" if (not use_patched) else "<exe_debug_relpath>"
 exe  = ELF(binary_name, checksec=True)
 libc = ELF("<libc_relpath>", checksec=False)
 context.binary = exe
@@ -14,15 +15,15 @@ sl  = lambda *x, **y: io.sendline(*x, **y)
 sn  = lambda *x, **y: io.send(*x, **y)
 
 if args.REMOTE:
-	io = connect("<host>", "<port>")
+	io = connect("<host:HOST>", "<port:PORT>")
 elif args.GDB:
-	io = gdb.debug("<exe_debug_relpath>", """
+	io = gdb.debug(binary_name, """
 		c
 	""", aslr=False)
 else:
-	io = process(f"<exe_debug_relpath>")
+	io = process(binary_name)
 
-<interactions>
+# <interactions>
 
 
 io.interactive()
