@@ -7,6 +7,7 @@ from spwn.libc import Libc
 from spwn.interactions import Interactions
 from spwn.template import create_script
 from spwn.commands import run_custom_commands
+from spwn.utils import log
 
 def main():
 
@@ -20,6 +21,8 @@ def main():
 	exe_path = recognize_exe(Path(".").iterdir())
 	if exe_path:
 		exe = Exe(exe_path)
+	else:
+		log.warning("Exe not found")
 
 	# Recognize libc
 	libc = None
