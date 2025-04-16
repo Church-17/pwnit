@@ -14,8 +14,9 @@ def replace_placeholders(
 	) -> str | None:
 
 	# Handle host and port from remote
-	host, port = remote.split(":", 1) if remote and ":" in remote else (None, None)
+	host, port = remote.split(":", 1) if remote else (None, None)
 
+	# Create substitution dictionary
 	substitutions: dict[str, str | None] = {
 		"exe_basename": exe.path.name if exe else None,
 		"exe_relpath": f"{relative_path(exe.path)}" if exe else None,
@@ -37,17 +38,30 @@ def replace_placeholders(
 		"port": port,
 		"interactions": interactions,
 	}
-	
-	missing = False
+
+	# Define error when a placeholder is cannot be substituted
+	class SubstitutionError(Exception): ...
+
+	# Define the substitution function
 	def substitute(re_match: re.Match) -> str:
-		nonlocal missing
 		placeholder = re_match.group(1)
+
+		# If the found regex is a correct placeholder
 		if placeholder in substitutions:
+
+			# If placeholder can be substitute with a good value, return it
 			if substitutions[placeholder]: return substitutions[placeholder]
+
+			# If there is an integrated default, use it
 			elif re_match.group(2): return re_match.group(3)
-			elif not keep_missing: missing = True
+
+			# If the missing can't be kept, raise an error to stop the substitutions
+			elif not keep_missing: raise SubstitutionError
+		
+		# If the found regex is not a correct placeholder, or the missing can be kept, don't do anything
 		return re_match.group(0)
 
-	text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
-	if missing: return None
+	# Sunstitute placeholders handling substitution error
+	try: text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
+	except SubstitutionError: return None
 	return text
