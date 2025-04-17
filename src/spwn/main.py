@@ -22,7 +22,7 @@ def main():
 		exe = Exe(exe_path)
 	else:
 		exe = None
-		log.warning("Exe not found")
+		log.warning("Exe: not found")
 
 	# Recognize libc
 	if not (exe and exe.statically_linked):
