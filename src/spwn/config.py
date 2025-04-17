@@ -1,10 +1,9 @@
 from pathlib import Path
 import json
-import requests
-from spwn.file_manage import handle_path, check_file, check_dir
+from spwn.file_manage import handle_path, check_file, check_dir, download_file
 from spwn.args import Args
 
-CONFIG_DIR_PATH = handle_path("~/.config/spwn/")
+CONFIG_DIR_PATH: Path = handle_path("~/.config/spwn/")
 CONFIG_FILEPATH = CONFIG_DIR_PATH / "config.json"
 DEFAULT_CONFIG = {
 	"check_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
@@ -17,7 +16,7 @@ DEFAULT_CONFIG = {
 	"interactions": False,
 	"pwntube_variable": "io",
 	"tab": "\t",
-	"script_path": "solve_<exe_basename>.py",
+	"script_path": "solve_<exe_basename:>.py",
 	"commands": [],
 }
 
@@ -45,9 +44,7 @@ class Config:
 		self.patch_path: Path | None = handle_path(patch_path)
 		self.yara_rules: Path | None = handle_path(yara_rules)
 		self.template_path: Path | None = handle_path(template_path)
-		self.script_path: Path | None = handle_path(script_path)
-		if not self.script_path and self.template_path:
-			self.script_path = Path(self.template_path.name)
+		self.script_path: Path | None = handle_path(script_path) or (self.template_path.name if self.template_path else None)
 
 		# Handle only mode
 		if args.only:
@@ -58,6 +55,7 @@ class Config:
 			if not args.libc_source: self.download_libc_source = False
 			if not args.interactions and not args.template: self.template_path = None
 			if not args.interactions: self.interactions = False
+			self.commands = []
 
 
 	def read_config_file(self) -> dict[str]:
@@ -73,16 +71,8 @@ class Config:
 			CONFIG_FILEPATH.write_text(json.dumps(DEFAULT_CONFIG, indent='\t'))
 
 			# Try to download missing config files
-			def download_config_file(key: str, url: str):
-				yara_rules = handle_path(DEFAULT_CONFIG[key])
-				if yara_rules and not check_file(yara_rules):
-					try:
-						response = requests.get(url)
-						yara_rules.write_text(response.text)
-					except:
-						pass
-			download_config_file("yara_rules", "https://raw.githubusercontent.com/polymorf/findcrypt-yara/master/findcrypt3.rules")
-			download_config_file("template_path", "https://raw.githubusercontent.com/Church-17/spwn/master/resources/template.py")
+			download_file(handle_path(DEFAULT_CONFIG["yara_rules"]), "https://raw.githubusercontent.com/polymorf/findcrypt-yara/master/findcrypt3.rules")
+			download_file(handle_path(DEFAULT_CONFIG["template_path"]), "https://raw.githubusercontent.com/Church-17/spwn/master/resources/template.py")
 
 			actual_config = DEFAULT_CONFIG
 		

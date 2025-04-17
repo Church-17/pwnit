@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
 import shutil
+import requests
 from spwn.utils import ask, choose, run_command
 
 
@@ -90,3 +91,14 @@ def fix_if_exist(path: Path) -> Path:
 				path.unlink()
 			break
 	return path
+
+
+def download_file(filepath: Path, url: str) -> None:
+	if not check_file(filepath):
+		try:
+			response = requests.get(url)
+			if response.ok:
+				filepath.write_text(response.text)
+		except:
+			pass
+
