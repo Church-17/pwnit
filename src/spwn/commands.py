@@ -18,7 +18,7 @@ def run_custom_commands(
 		if not new_cmd: continue
 
 		# Run command
-		with log.progress(f"Command: {blue(new_cmd)} ") as progress:
+		with log.progress(f"$ {blue(new_cmd)} ") as progress:
 			output = run_command(new_cmd, progress, shell=True)
 			if output is not None:
 				progress.success()
