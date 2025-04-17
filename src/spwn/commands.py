@@ -1,3 +1,4 @@
+from pwnlib.term.text import blue
 from spwn.utils import log, run_command
 from spwn.exe import Exe
 from spwn.libc import Libc
@@ -17,8 +18,9 @@ def run_custom_commands(
 		if not new_cmd: continue
 
 		# Run command
-		output = run_command(new_cmd, shell=True)
-		if output is not None:
-			log.success(f"`{new_cmd}` executed")
-			if output:
-				log.info(output)
+		with log.progress(f"Command: {blue(new_cmd)} ") as progress:
+			output = run_command(new_cmd, progress, shell=True)
+			if output is not None:
+				progress.success()
+				if output:
+					log.info(output)
