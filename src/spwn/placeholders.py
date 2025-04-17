@@ -2,6 +2,7 @@ import re
 from spwn.file_manage import relative_path
 from spwn.exe import Exe
 from spwn.libc import Libc
+from spwn.interactions import Interactions
 
 
 def replace_placeholders(
@@ -9,7 +10,7 @@ def replace_placeholders(
 		exe: Exe | None = None,
 		libc: Libc | None = None,
 		remote: str | None = None,
-		interactions: str | None = None,
+		interactions: Interactions | None = None,
 		keep_missing: bool = True,
 	) -> str | None:
 
@@ -39,6 +40,9 @@ def replace_placeholders(
 		"interactions": interactions,
 	}
 
+	# Prepare to replace interactions
+	interactions_matches = re.finditer(r"([ \t]*?)(?:#.*?)?<interactions(?:(:)(.*?))?>", text)
+
 	# Define error when a placeholder is cannot be substituted
 	class SubstitutionError(Exception): ...
 
@@ -50,7 +54,14 @@ def replace_placeholders(
 		if placeholder in substitutions:
 
 			# If placeholder can be substitute with a good value, return it
-			if substitutions[placeholder]: return substitutions[placeholder]
+			if substitutions[placeholder]:
+
+				# Handle tabs before interactions tag
+				if placeholder == "interactions":
+					nonlocal interactions_matches
+					return interactions.dump(next(interactions_matches).group(1))
+					
+				return substitutions[placeholder]
 
 			# If there is an integrated default, use it
 			elif re_match.group(2): return re_match.group(3)
@@ -62,6 +73,7 @@ def replace_placeholders(
 		return re_match.group(0)
 
 	# Sunstitute placeholders handling substitution error
-	try: text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
+	try: new_text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
 	except SubstitutionError: return None
-	return text
+
+	return new_text

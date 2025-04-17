@@ -29,18 +29,8 @@ def create_script(
 		log.failure("There is neither a template file nor a script file. A new script will not be created")
 		return
 
-	# Search for spaces before interactions
-	match = re.search(r"([ \t]*)(?:#[ \t]*)?<interactions(?:(:)(.*?))?>", content)
-	tab_interactions_placeholder: str = match.group(1) if match else ""
-
 	# Replace placeholders
-	new_content = replace_placeholders(
-		content,
-		exe,
-		libc,
-		remote,
-		interactions.dump(tab_interactions_placeholder) if interactions else None,
-	)
+	new_content = replace_placeholders(content, exe, libc, remote, interactions)
 
 	# Write new script
 	script_path.write_text(new_content)
