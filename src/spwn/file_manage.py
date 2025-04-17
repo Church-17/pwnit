@@ -97,7 +97,7 @@ def download_file(filepath: Path, url: str) -> None:
 	if not check_file(filepath):
 		try:
 			response = requests.get(url)
-			if response.ok:
+			if response:
 				filepath.write_text(response.text)
 		except:
 			pass
