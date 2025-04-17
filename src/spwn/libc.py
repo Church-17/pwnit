@@ -63,7 +63,7 @@ class Libc(Binary):
 
 			# Check numeric libc version
 			if not self.libc_version:
-				progress.failure("Libc version absent")
+				progress.failure("Missing libc version")
 				return
 			
 			# Handle cache dir
