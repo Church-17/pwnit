@@ -1,9 +1,9 @@
 from pwn import *
 
 use_patched = False
-binary_name = "<exe_relpath>" if (not use_patched) else "<exe_debug_relpath>"
+binary_name = "<exe_relpath:EXE_PATH>" if (not use_patched) else "<exe_debug_relpath:EXE_DEBUG_PATH>"
 exe  = ELF(binary_name, checksec=True)
-libc = ELF("<libc_relpath>", checksec=False)
+libc = ELF("<libc_relpath:LIBC_PATH>", checksec=False)
 context.binary = exe
 
 ru  = lambda *x, **y: io.recvuntil(*x, **y)
