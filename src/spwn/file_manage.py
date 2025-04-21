@@ -1,3 +1,4 @@
+from typing import Iterable
 import re
 from pathlib import Path
 import shutil
@@ -5,7 +6,7 @@ import requests
 from spwn.utils import ask, choose, run_command
 
 
-def recognize_exe(path_list: list[Path]) -> Path | None:
+def recognize_exe(path_list: Iterable[Path]) -> Path | None:
 	"""Recognize the executable from a list of files"""
 
 	# Initialize potential executables list
@@ -28,7 +29,7 @@ def recognize_exe(path_list: list[Path]) -> Path | None:
 	return possible_exes[choose("Select executable:", possible_exes)] if possible_exes else None
 
 
-def recognize_libs(path_list: list[Path], libs_names: list[str] = []) -> dict[str, Path]:
+def recognize_libs(path_list: Iterable[Path], libs_names: Iterable[str] = []) -> dict[str, Path]:
 	"""Recognize the libs from a list of files, filtering for some of them"""
 
 	# Initialize potential libraries lists
