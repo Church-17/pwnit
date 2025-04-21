@@ -42,7 +42,7 @@ def main():
 		exe.check_functions(config.check_functions)
 
 		# Patch
-		if config.patch_path and (not exe.statically_linked) and (not exe.runpath): exe.patch(config.patch_path, libc)
+		if config.patch_path: exe.patch(config.patch_path, libc)
 
 		# Analyze
 		if config.seccomp: exe.seccomp()

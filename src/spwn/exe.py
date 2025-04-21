@@ -62,6 +62,9 @@ class Exe(Binary):
 	def patch(self, patch_path: Path, libc: Libc | None) -> None:
 		"""Patch the executable with the given libc"""
 
+		# Return if statically linked or already patched
+		if self.statically_linked or self.runpath: return
+
 		# Handle placeholders
 		from spwn.placeholders import replace_placeholders
 		patch_path = Path(replace_placeholders(f"{patch_path}", self, libc))
