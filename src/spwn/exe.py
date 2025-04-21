@@ -16,16 +16,17 @@ class Exe(Binary):
 		self.set_runnable_path(self.path)
 
 		# Retrieve required libs
-		self.required_libs: set[str] = set()
+		libs_paths: set[str] = set()
 		if not self.statically_linked:
 			try:
-				self.required_libs = {Path(lib).name for lib in self.libs if lib != self.path}
+				libs_paths = {lib for lib in self.libs if lib != self.path}
 			except:
 				ldd_output = run_command(["ldd", self.path], timeout=1)
 				if ldd_output:
-					self.required_libs = {Path(line.strip().split(" ", 1)[0]).name for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
-			if not self.required_libs:
+					libs_paths = {line.strip().split(" ", 1)[0] for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
+			if not libs_paths:
 				log.failure("Impossible to retrieve the requested libs")
+		self.required_libs: set[str] = {Path(lib).name for lib in libs_paths}
 
 
 	def set_runnable_path(self, path: Path) -> None:
