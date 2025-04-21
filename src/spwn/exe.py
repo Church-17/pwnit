@@ -47,7 +47,7 @@ class Exe(Binary):
 	def describe(self):
 		log.info("\n".join([
 			f"Arch:       {self.arch}-{self.bits}-{self.endian}",
-			f"Linking:    {red('Static') if self.statically_linked else green("Dynamic")}",
+			f"Linking:    {red('Static') if self.statically_linked else green('Dynamic')}",
 			f"{self.checksec()}",
 		]))
 
