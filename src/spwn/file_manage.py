@@ -26,7 +26,7 @@ def recognize_exe(path_list: Iterable[Path]) -> Path | None:
 		possible_exes.append(file)
 
 	# Return correct executable path or none
-	return possible_exes[choose("Select executable:", possible_exes)] if possible_exes else None
+	return choose(possible_exes, "Select executable:") if possible_exes else None
 
 
 def recognize_libs(path_list: Iterable[Path], libs_names: Iterable[str] = []) -> dict[str, Path]:
@@ -51,7 +51,7 @@ def recognize_libs(path_list: Iterable[Path], libs_names: Iterable[str] = []) ->
 			possible_libs[lib_name].append(file)
 
 	# Select actual libs and return them
-	return {lib_name: opts[choose(f"Select {lib_name}:", opts)] for lib_name, opts in possible_libs.items()}
+	return {lib_name: choose(opts, f"Select {lib_name}:") for lib_name, opts in possible_libs.items()}
 
 
 def handle_path(path: str | None) -> Path | None:

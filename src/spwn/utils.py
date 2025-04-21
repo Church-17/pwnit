@@ -1,3 +1,4 @@
+from typing import TypeVar
 import subprocess
 from pwn import log, context, options
 from pwnlib.log import Progress, Logger
@@ -13,10 +14,11 @@ def ask(prompt: str, can_skip: bool = True) -> str:
 		log.warning("Can't skip")
 
 
-def choose(prompt: str, opts: list, default: int | None = None) -> int:
+ElementT = TypeVar("ElementT")
+def choose(opts: list[ElementT], prompt: str = "Choose:", default: int | None = None) -> ElementT:
 	assert opts
-	if len(opts) == 1: return 0
-	return options(prompt, list(map(str, opts)), default)
+	if len(opts) == 1: return opts[0]
+	return opts[options(prompt, list(map(str, opts)), default)]
 
 
 def run_command(args: list | str, progress_log: Progress | Logger = log, **kwargs) -> str | None:
