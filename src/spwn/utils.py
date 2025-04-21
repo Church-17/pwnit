@@ -9,7 +9,7 @@ log_silent = context.silent
 
 def ask(prompt: str, can_skip: bool = True) -> str:
 	while True:
-		received = input(f" [{yellow("?")}] {prompt} > ")
+		received = input(f" [{yellow('?')}] {prompt} > ")
 		if received or can_skip: return received
 		log.warning("Can't skip")
 
@@ -18,7 +18,7 @@ ElementT = TypeVar("ElementT")
 def choose(opts: list[ElementT], prompt: str = "Choose:", default: int | None = None) -> ElementT:
 	assert opts
 	if len(opts) == 1: return opts[0]
-	return opts[options(prompt, list(map(str, opts)), default)]
+	return opts[options(f"\r [{yellow('?')}] {prompt}", list(map(str, opts)), default)]
 
 
 def run_command(args: list | str, progress_log: Progress | Logger = log, **kwargs) -> str | None:
