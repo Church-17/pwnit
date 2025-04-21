@@ -31,7 +31,7 @@ def recognize_exe(path_list: list[Path]) -> Path | None:
 def recognize_libs(path_list: list[Path], libs_names: list[str] = []) -> dict[str, Path]:
 	"""Recognize the libs from a list of files, filtering for some of them"""
 
-	# Initialize potential libriaries lists
+	# Initialize potential libraries lists
 	possible_libs: dict[str, list[Path]] = {}
 	search_for = r'|'.join(libs_names) if libs_names else r"[A-Za-z]+"
 
