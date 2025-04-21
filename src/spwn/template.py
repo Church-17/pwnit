@@ -1,5 +1,4 @@
 from pathlib import Path
-import re
 from spwn.utils import log
 from spwn.file_manage import check_file
 from spwn.exe import Exe
