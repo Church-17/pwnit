@@ -26,7 +26,7 @@ class Exe(Binary):
 					libs_paths = {line.strip().split(" ", 1)[0] for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
 			if not libs_paths:
 				log.failure("Impossible to retrieve the requested libs")
-		self.required_libs: set[str] = {Path(lib).name for lib in libs_paths}
+		self.required_libs: dict[str, Path] = recognize_libs({Path(Path(lib).name) for lib in libs_paths})
 
 
 	def set_runnable_path(self, path: Path) -> None:
@@ -78,41 +78,46 @@ class Exe(Binary):
 		with log.progress("Patch", "Copying and unstripping libs...") as progress:
 
 			# Get libs names of the required libs
-			required_libs_dict = recognize_libs({Path(lib) for lib in self.required_libs})
+			missing_libs = self.required_libs.copy()
 			loader_path = None
 
+			# Copy and unstrip libc
+			if libc:
+				new_path = debug_dir / missing_libs["libc"]
+				shutil.copy2(libc.path, new_path)
+				missing_libs.pop("libc")
+				with log_silent:
+					try:
+						libcdb.unstrip_libc(f"{new_path}")
+					except:
+						pass
+				libc.debug_path = new_path.resolve()
+
 			# Copy the libs from cwd
-			for lib, file in recognize_libs(Path(".").iterdir(), required_libs_dict.keys()).items():
-				new_path = debug_dir / required_libs_dict[lib]
+			for lib, file in recognize_libs(Path(".").iterdir(), missing_libs.keys()).items():
+				new_path = debug_dir / missing_libs[lib]
 				shutil.copy2(file, new_path)
-				required_libs_dict.pop(lib)
+				missing_libs.pop(lib)
 
 				# Handle specific lib
-				if lib == "libc" and libc:
-					with log_silent:
-						try:
-							libcdb.unstrip_libc(str(new_path))
-						except:
-							pass
-					libc.debug_path = new_path.resolve()
-				elif lib == "ld":
+				if lib == "ld":
 					loader_path = new_path
 
 			# Copy libs from downloaded libs
 			if libc and libc.libs_path:
 				libs_set = {Path(lib.name) for lib in libc.libs_path.iterdir()}
-				for lib, file in required_libs_dict.copy().items():
+				for lib, file in missing_libs.copy().items():
 					if file in libs_set:
 						shutil.copy2(libc.libs_path / file, debug_dir)
-						required_libs_dict.pop(lib)
+						missing_libs.pop(lib)
 
 						# Handle specific lib
 						if lib == "ld":
 							loader_path = debug_dir / file
 				
 			# Check missing libs
-			if required_libs_dict:
-				log.warning(f"Missing libs for patch: {', '.join([yellow(str(lib)) for lib in required_libs_dict.values()])}")
+			if missing_libs:
+				log.warning(f"Missing libs for patch: {', '.join([yellow(str(lib)) for lib in missing_libs.values()])}")
 
 			# Run patchelf
 			progress.status("Run patchelf...")

@@ -25,7 +25,7 @@ def main():
 		log.warning("Exe: not found")
 
 	# Recognize libc
-	if not (exe and exe.statically_linked):
+	if (not exe) or ("libc" in exe.required_libs):
 		libcs = recognize_libs(Path(exe.runpath.decode() if (exe and exe.runpath) else ".").iterdir(), ["libc"])
 		libc = Libc(libcs["libc"]) if ("libc" in libcs) else None
 	else:
