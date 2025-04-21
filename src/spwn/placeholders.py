@@ -73,7 +73,9 @@ def replace_placeholders(
 		return re_match.group(0)
 
 	# Substitute placeholders handling substitution error
-	try: new_text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
-	except SubstitutionError: return None
+	try:
+		new_text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
+	except SubstitutionError:
+		return None
 
 	return new_text
