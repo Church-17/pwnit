@@ -72,7 +72,7 @@ def replace_placeholders(
 		# If the found regex is not a correct placeholder, or the missing can be kept, don't do anything
 		return re_match.group(0)
 
-	# Sunstitute placeholders handling substitution error
+	# Substitute placeholders handling substitution error
 	try: new_text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
 	except SubstitutionError: return None
 
