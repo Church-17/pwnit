@@ -52,7 +52,7 @@ class Exe(Binary):
 
 
 	def check_functions(self, check_functions: list[str]) -> None:
-		"""Print some darngerous functions used in the executable"""
+		"""Print some interesting functions used in the executable"""
 
 		found_functions = [red(f) for f in check_functions if f in self.sym]
 		if found_functions:
