@@ -41,7 +41,7 @@ def replace_placeholders(
 	}
 
 	# Prepare to replace interactions
-	interactions_matches = re.finditer(r"([ \t]*?)(?:#.*?)?<interactions(?:(:)(.*?))?>", text)
+	interactions_matches = re.finditer(r"([ \t]*?)(?:#.*?)?<interactions(:.*?)?>", text)
 
 	# Define error when a placeholder is cannot be substituted
 	class SubstitutionError(Exception): ...
@@ -64,7 +64,7 @@ def replace_placeholders(
 				return substitutions[placeholder]
 
 			# If there is an integrated default, use it
-			elif re_match.group(2): return re_match.group(3)
+			elif re_match.group(2): return re_match.group(2)[1:]
 
 			# If the missing can't be kept, raise an error to stop the substitutions
 			elif not keep_missing: raise SubstitutionError
@@ -74,7 +74,7 @@ def replace_placeholders(
 
 	# Substitute placeholders handling substitution error
 	try:
-		new_text = re.sub(r"<(.*?)(?:(:)(.*?))?>", substitute, text)
+		new_text = re.sub(r"<(.*?)(:.*?)?>", substitute, text)
 	except SubstitutionError:
 		return None
 
