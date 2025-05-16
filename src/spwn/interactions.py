@@ -57,9 +57,7 @@ class InteractionFunction:
 		menu_recvuntil = menu_recvuntil.replace("\"", "\\\"")
 		send_to_select = self.send_to_select.replace("\"", "\\\"")
 		send_args = [
-			f'{tab}{pwntube_variable}.sendlineafter('
-			'b\"' + arg.sendafter.replace("\"", "\\\"") + '\", '
-			f'{arg.name} if isinstance({arg.name}, bytes) else str({arg.name}).encode())'
+			f'{tab}{pwntube_variable}.sendlineafter(b\"' + arg.sendafter.replace("\"", "\\\"") + f'\", {arg.name} if isinstance({arg.name}, bytes) else str({arg.name}).encode())'
 			for arg in self.arguments
 		]
 		result = "\n".join([
