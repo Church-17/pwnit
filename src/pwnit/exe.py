@@ -179,12 +179,3 @@ class Exe(Binary):
 				addresses = [instance.offset for string_match in match.strings for instance in string_match.instances]
 				matches_str.append(f'{match.rule} at {", ".join(map(hex, addresses))}')
 			log.info("\n".join(matches_str))
-
-
-	def cwe(self) -> None:
-		"""Print the possible CWEs"""
-
-		with log.progress("CWE", "Analizing... (Press Ctrl-C to interrupt)") as progress:
-			cmd_output = run_command(["cwe_checker", self.path], progress_log=progress)
-			if cmd_output:
-				log.info(cmd_output)

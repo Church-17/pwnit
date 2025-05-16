@@ -47,7 +47,6 @@ def main():
 		# Analyze
 		if config.seccomp: exe.seccomp()
 		if config.yara_rules: exe.yara(config.yara_rules)
-		if config.cwe: exe.cwe()
 	
 		print()
 
@@ -56,7 +55,7 @@ def main():
 	if libc:
 
 		# Download libc source
-		if config.download_libc_source: libc.download_source()
+		if config.libc_source: libc.download_source()
 
 		print()
 
