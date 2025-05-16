@@ -58,7 +58,7 @@ class InteractionFunction:
 		send_to_select = self.send_to_select.replace("\"", "\\\"")
 		send_args = [
 			f'{tab}{pwntube_variable}.sendlineafter('
-			f'b\"{arg.sendafter.replace("\"", "\\\"")}\", '
+			'b\"' + arg.sendafter.replace("\"", "\\\"") + '\", '
 			f'{arg.name} if isinstance({arg.name}, bytes) else str({arg.name}).encode())'
 			for arg in self.arguments
 		]
