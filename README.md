@@ -1,4 +1,4 @@
-# Pwnit
+# PwnIt
 
 This repository started as a fork of [spwn](https://github.com/MarcoMeinardi/spwn). It was a good tools for initialize a PWN challenge, but I wanted more customization, and since it had not been maintained for a couple of years, I started to look into the code to give more freedom to the user. In the end, I ended up completely refactoring the code and adding some useful features.
 
@@ -9,11 +9,10 @@ This repository started as a fork of [spwn](https://github.com/MarcoMeinardi/spw
   - interesting functions
   - seccomp rules
   - cryptographic constants
-  - CWEs
 - Patch executable:
-  - Download and unstrip the libs (loader included) related to the detected libc
-  - Set runpath and interpreter of the executable with the libs from the cwd or from the downloaded libs
-- Set binary and loader executable
+  - Download and unstrip all the libraries related to the detected libc (loader included)
+  - Set runpath and interpreter of the executable with the libraries from the cwd or from the downloaded ones
+- Set binary and loader to be executable
 - Interactively generate functions to interact with the binary with a menu
 - Generate the solve script from your template
 - Download the libc source code
@@ -52,4 +51,3 @@ sudo apt install patchelf elfutils ruby-rubygems
 
 sudo gem install seccomp-tools
 ```
-To install `cwe_checker` follow the instructions in [their repository](https://github.com/fkie-cad/cwe_checker).
