@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 dynamic = ["version"]
 
-name = "spwn"
+name = "pwnit"
 description = "Automatic tool to quickly start a pwn CTF challenge"
 authors = [
 	{name="Matteo Chiesa", email="matteo.chiesa.mc@gmail.com"}
@@ -19,9 +19,10 @@ license = {file = "LICENSE"}
 
 requires-python = ">=3.10"
 dependencies = [
+	"PyYAML",
 	"requests",
 	"pwntools",
-	"yara-python"
+	"yara-python",
 ]
 
 keywords = ["pwn", "ctf"]
@@ -36,10 +37,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Church-17/spwn"
+Homepage = "https://github.com/Church-17/pwnit"
 
 [project.scripts]
-spwn = "spwn.main:main"
+pwnit = "pwnit.main:main"
 
 [tool.hatch.version]
-path = "src/spwn/__init__.py"
+path = "src/pwnit/__init__.py"

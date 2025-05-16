@@ -1,6 +1,6 @@
-# Spwn
+# Pwnit
 
-This repository started as a fork of [the original spwn](https://github.com/MarcoMeinardi/spwn). It was a good tools for initialize a PWN challenge, but I wanted more customization, and since it had not been maintained for a couple of years, I started to look into the code to give more freedom to the user. In the end, I ended up completely refactoring the code and adding some useful features.
+This repository started as a fork of [spwn](https://github.com/MarcoMeinardi/spwn). It was a good tools for initialize a PWN challenge, but I wanted more customization, and since it had not been maintained for a couple of years, I started to look into the code to give more freedom to the user. In the end, I ended up completely refactoring the code and adding some useful features.
 
 ## Features
 - Auto detect files from cwd (executable and all the libs)
@@ -20,9 +20,9 @@ This repository started as a fork of [the original spwn](https://github.com/Marc
 
 ## Usage
 ```
-usage: spwn [-h] [-r REMOTE] [-i] [-t TEMPLATE] [-o] [--source] [--patch PATCH] [--seccomp] [--yara YARA] [--cwe]
+usage: pwnit [-h] [-r REMOTE] [-i] [-t TEMPLATE] [-o] [--source] [--patch PATCH] [--seccomp] [--yara YARA] [--cwe]
 
-spwn is a tool to quickly start a pwn challenge
+pwnit is a tool to quickly start a pwn challenge
 
 options:
   -h, --help            show this help message and exit

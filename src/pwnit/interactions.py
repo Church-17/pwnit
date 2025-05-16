@@ -1,6 +1,6 @@
 from pwn import process
-from spwn.utils import log, log_silent, ask
-from spwn.exe import Exe
+from pwnit.utils import log, log_silent, ask
+from pwnit.exe import Exe
 
 
 class Interactions:

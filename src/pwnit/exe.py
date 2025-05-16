@@ -2,10 +2,10 @@ from pathlib import Path
 import shutil
 from pwn import libcdb
 from pwnlib.term.text import red, yellow, green
-from spwn.utils import log, log_silent, run_command
-from spwn.file_manage import recognize_libs, fix_if_exist
-from spwn.binary import Binary
-from spwn.libc import Libc
+from pwnit.utils import log, log_silent, run_command
+from pwnit.file_manage import recognize_libs, fix_if_exist
+from pwnit.binary import Binary
+from pwnit.libc import Libc
 
 
 class Exe(Binary):
@@ -67,7 +67,7 @@ class Exe(Binary):
 		if self.statically_linked or self.runpath: return
 
 		# Handle placeholders
-		from spwn.placeholders import replace_placeholders
+		from pwnit.placeholders import replace_placeholders
 		patch_path = Path(replace_placeholders(f"{patch_path}", self, libc))
 
 		# Create debug dir

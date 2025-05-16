@@ -1,8 +1,8 @@
 from pwnlib.term.text import blue
-from spwn.utils import log, run_command
-from spwn.exe import Exe
-from spwn.libc import Libc
-from spwn.placeholders import replace_placeholders
+from pwnit.utils import log, run_command
+from pwnit.exe import Exe
+from pwnit.libc import Libc
+from pwnit.placeholders import replace_placeholders
 
 def run_custom_commands(
 		commands: list[str],

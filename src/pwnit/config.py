@@ -1,9 +1,9 @@
 from pathlib import Path
 import json
-from spwn.file_manage import handle_path, check_file, check_dir, download_file
-from spwn.args import Args
+from pwnit.file_manage import handle_path, check_file, check_dir, download_file
+from pwnit.args import Args
 
-CONFIG_DIR_PATH: Path = handle_path("~/.config/spwn/")
+CONFIG_DIR_PATH: Path = handle_path("~/.config/pwnit/")
 CONFIG_FILEPATH = CONFIG_DIR_PATH / "config.json"
 DEFAULT_CONFIG = {
 	"check_functions": ["system", "gets", "ptrace", "memfrob", "strfry", "execve", "execl", "execlp", "execle", "execv", "execvp", "execvpe"],
@@ -72,7 +72,7 @@ class Config:
 
 			# Try to download missing config files
 			download_file(handle_path(DEFAULT_CONFIG["yara_rules"]), "https://raw.githubusercontent.com/polymorf/findcrypt-yara/master/findcrypt3.rules")
-			download_file(handle_path(DEFAULT_CONFIG["template_path"]), "https://raw.githubusercontent.com/Church-17/spwn/master/resources/template.py")
+			download_file(handle_path(DEFAULT_CONFIG["template_path"]), "https://raw.githubusercontent.com/Church-17/pwnit/master/resources/template.py")
 
 			actual_config = DEFAULT_CONFIG
 		

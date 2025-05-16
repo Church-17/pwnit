@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 import shutil
 import requests
-from spwn.utils import ask, choose, run_command
+from pwnit.utils import ask, choose, run_command
 
 
 def recognize_exe(path_list: Iterable[Path]) -> Path | None:

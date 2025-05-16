@@ -1,13 +1,13 @@
 from pathlib import Path
-from spwn.args import Args
-from spwn.config import Config
-from spwn.file_manage import recognize_exe, recognize_libs
-from spwn.exe import Exe
-from spwn.libc import Libc
-from spwn.interactions import Interactions
-from spwn.template import create_script
-from spwn.commands import run_custom_commands
-from spwn.utils import log
+from pwnit.args import Args
+from pwnit.config import Config
+from pwnit.file_manage import recognize_exe, recognize_libs
+from pwnit.exe import Exe
+from pwnit.libc import Libc
+from pwnit.interactions import Interactions
+from pwnit.template import create_script
+from pwnit.commands import run_custom_commands
+from pwnit.utils import log
 
 def main():
 

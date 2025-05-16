@@ -23,8 +23,8 @@ class Args:
 
 		import argparse
 		parser = argparse.ArgumentParser(
-			prog="spwn",
-			description="spwn is a tool to quickly start a pwn challenge",
+			prog="pwnit",
+			description="pwnit is a tool to quickly start a pwn challenge",
 		)
 		parser.add_argument(
 			"-r", "--remote",

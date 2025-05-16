@@ -1,10 +1,10 @@
 from pathlib import Path
-from spwn.utils import log
-from spwn.file_manage import check_file
-from spwn.exe import Exe
-from spwn.libc import Libc
-from spwn.interactions import Interactions
-from spwn.placeholders import replace_placeholders
+from pwnit.utils import log
+from pwnit.file_manage import check_file
+from pwnit.exe import Exe
+from pwnit.libc import Libc
+from pwnit.interactions import Interactions
+from pwnit.placeholders import replace_placeholders
 
 
 def create_script(

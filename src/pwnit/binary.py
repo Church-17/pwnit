@@ -1,6 +1,6 @@
 from pathlib import Path
 from pwn import ELF
-from spwn.utils import log
+from pwnit.utils import log
 
 class Binary(ELF):
 	def __init__(self, filepath: Path) -> None:

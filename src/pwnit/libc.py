@@ -3,9 +3,9 @@ import re
 import tarfile
 import requests
 from pwn import libcdb
-from spwn.utils import log, log_silent
-from spwn.file_manage import handle_path, check_dir
-from spwn.binary import Binary
+from pwnit.utils import log, log_silent
+from pwnit.file_manage import handle_path, check_dir
+from pwnit.binary import Binary
 
 
 class Libc(Binary):
@@ -67,7 +67,7 @@ class Libc(Binary):
 				return
 			
 			# Handle cache dir
-			cache_dir = Path("~/.cache/spwn").expanduser()
+			cache_dir = Path("~/.cache/pwnit").expanduser()
 			if not check_dir(cache_dir):
 				cache_dir.mkdir()
 

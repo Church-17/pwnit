@@ -1,8 +1,8 @@
 import re
-from spwn.file_manage import relative_path
-from spwn.exe import Exe
-from spwn.libc import Libc
-from spwn.interactions import Interactions
+from pwnit.file_manage import relative_path
+from pwnit.exe import Exe
+from pwnit.libc import Libc
+from pwnit.interactions import Interactions
 
 
 def replace_placeholders(
