@@ -10,10 +10,9 @@ class Args:
 		self.template: str | None	= args["template"]
 		self.only: bool				= args["only"]
 		self.libc_source: bool		= args["libc_source"]
-		self.patch: str | None		= args["patch"]
+		self.patch: bool			= args["patch"]
 		self.seccomp: bool			= args["seccomp"]
-		self.yara: str | None		= args["yara"]
-		self.cwe: bool				= args["cwe"]
+		self.yara: bool				= args["yara"]
 
 		if self.remote: assert re.search(r"^[^\:]+\:\d+$", self.remote), "Remote parameter without the correct syntax '<host>:<port>'"
 
@@ -52,6 +51,7 @@ class Args:
 		parser.add_argument(
 			"--patch",
 			help="Patch the executable with the specified path",
+			action="store_true",
 		)
 		parser.add_argument(
 			"--seccomp",
@@ -61,10 +61,6 @@ class Args:
 		parser.add_argument(
 			"--yara",
 			help="Check for given Yara rules",
-		)
-		parser.add_argument(
-			"--cwe",
-			help="Check for CWEs",
 			action="store_true",
 		)
 		return parser.parse_args().__dict__
