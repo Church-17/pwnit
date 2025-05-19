@@ -1,8 +1,12 @@
+# VSCode configurations
 .vscode
-.ctags*
+
+# Python temporary files
 __pycache__
 egg-info
 build
 dist
+
+.ctags*
 test
 todo.md
