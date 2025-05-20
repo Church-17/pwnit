@@ -10,7 +10,7 @@ class Config:
 	def __init__(self, args: Args) -> None:
 
 		# Read and validate config
-		config = self.validate_config(self.read_config_file())
+		config: dict[str] = self.validate_config(self.read_config_file())
 
 		# Retrieve template to use
 		if args.template:
@@ -23,19 +23,20 @@ class Config:
 			log.warning("Default template isn't present in the configuration")
 			template = config["templates"][choose(list(config["templates"]), "Choose template to use:")]
 		else:
-			template = None
+			template = {}
+		assert isinstance(template, dict)
 
 		# Set config variables
 		self.check_functions: list[str] = config["check_functions"]["list"] if config["check_functions"]["enable"] else []
 		self.patch_path: Path | None	= handle_path(config["patch"]["path"]) if args.patch or config["patch"]["enable"] else None
-		self.seccomp: bool				= True if args.seccomp or config["seccomp"]["enable"] else False
+		self.seccomp: bool				= args.seccomp or config["seccomp"]["enable"]
 		self.yara_rules: Path | None	= handle_path(config["yara"]["path"]) if args.yara or config["yara"]["enable"] else None
-		self.libc_source: bool			= True if args.libc_source or config["libc_source"]["enable"] else False
+		self.libc_source: bool			= args.libc_source or config["libc_source"]["enable"]
 		self.template_path: Path | None	= handle_path(template["path"]) if template else None
-		self.interactions: bool			= args.interactions or template["interactions"]
-		self.pwntube_variable: str		= template["pwntube_variable"]
-		self.tab: str					= template["tab"]
-		self.script_path: str | None	= handle_path(template["script_path"])
+		self.interactions: bool			= args.interactions or template["interactions"] if template else False
+		self.pwntube_variable: str		= template["pwntube_variable"] if template else "io"
+		self.tab: str					= template["tab"] if template else "\t"
+		self.script_path: str | None	= handle_path(template["script_path"]) if template else ""
 		self.commands: list[str]		= config["commands"]
 
 		# Handle only mode
@@ -70,7 +71,7 @@ class Config:
 
 		return config
 	
-	def validate_config(self, config):
+	def validate_config(self, config: dict[str]) -> dict[str]:
 		import cerberus
 
 		CONFIG_SCHEMA = {
