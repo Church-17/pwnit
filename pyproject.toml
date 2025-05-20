@@ -19,7 +19,8 @@ license = {file = "LICENSE"}
 
 requires-python = ">=3.10"
 dependencies = [
-	"PyYAML",
+	"pyyaml",
+	"cerberus",
 	"requests",
 	"pwntools",
 	"yara-python",

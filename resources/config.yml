@@ -1,23 +1,23 @@
-check_functions: 
+check_functions:
   enable: true
-  list: 
+  list:
     - "system"
     - "gets"
     - "ptrace"
     - "execve"
 
-patch: 
+patch:
   enable: true
   path: "./debug/<exe_basename>_patched"
 
-seccomp: 
+seccomp:
   enable: true
 
-yara: 
+yara:
   enable: true
   path: "/home/matte/.config/pwnit/findcrypt3.rules"
 
-libc_source: 
+libc_source:
   enable: false
 
 templates:
@@ -27,5 +27,6 @@ templates:
     pwntube_variable: "io"
     tab: "\t"
     script_path: "solve_<exe_basename:>.py"
-  
-commands: []
+
+# commands:
+#   - "echo '<exe_basename>'"

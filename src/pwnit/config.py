@@ -1,6 +1,7 @@
 from pathlib import Path
 from pwnit.file_manage import handle_path, check_file, check_dir, download_file
 from pwnit.args import Args
+from pwnit.utils import log, choose
 
 CONFIG_DIRPATH: Path = handle_path("~/.config/pwnit/")
 CONFIG_FILEPATH = CONFIG_DIRPATH / "config.yml"
@@ -8,24 +9,34 @@ CONFIG_FILEPATH = CONFIG_DIRPATH / "config.yml"
 class Config:
 	def __init__(self, args: Args) -> None:
 
-		# Read (and create if necessary) the config
-		config = self.read_config_file()
+		# Read and validate config
+		config = self.validate_config(self.read_config_file())
+
+		# Retrieve template to use
+		if args.template:
+			if args.template not in config["templates"]:
+				log.error("Speficied template isn't present in the configuration")
+			template = config["templates"][args.template]
+		elif "default" in config["templates"]:
+			template = config["templates"]["default"]
+		elif config["templates"]:
+			log.warning("Default template isn't present in the configuration")
+			template = config["templates"][choose(list(config["templates"]), "Choose template to use:")]
+		else:
+			template = None
 
 		# Set config variables
-		self.check_functions: list[str] = config["check_functions"].get("list", []) if config["check_functions"]["enable"] else []
+		self.check_functions: list[str] = config["check_functions"]["list"] if config["check_functions"]["enable"] else []
 		self.patch_path: Path | None	= handle_path(config["patch"]["path"]) if args.patch or config["patch"]["enable"] else None
 		self.seccomp: bool				= True if args.seccomp or config["seccomp"]["enable"] else False
 		self.yara_rules: Path | None	= handle_path(config["yara"]["path"]) if args.yara or config["yara"]["enable"] else None
 		self.libc_source: bool			= True if args.libc_source or config["libc_source"]["enable"] else False
-		self.commands: list[str]		= config.get("commands", [])
-
-		template: dict[str] | None		= config["templates"].get(args.template or "default", None)
-		if template:
-			self.template_path: Path | None	= handle_path(template["path"])
-			self.interactions: bool			= args.interactions or template["interactions"]
-			self.pwntube_variable: str		= template["pwntube_variable"]
-			self.tab: str					= template["tab"]
-			self.script_path: str | None	= handle_path(template["script_path"])
+		self.template_path: Path | None	= handle_path(template["path"]) if template else None
+		self.interactions: bool			= args.interactions or template["interactions"]
+		self.pwntube_variable: str		= template["pwntube_variable"]
+		self.tab: str					= template["tab"]
+		self.script_path: str | None	= handle_path(template["script_path"])
+		self.commands: list[str]		= config["commands"]
 
 		# Handle only mode
 		if args.only:
@@ -57,6 +68,46 @@ class Config:
 		with open(CONFIG_FILEPATH, "r") as config_file:
 			config = yaml.safe_load(config_file)
 
-		# TODO: check integrity
-
 		return config
+	
+	def validate_config(self, config):
+		import cerberus
+
+		CONFIG_SCHEMA = {
+			"check_functions": {"type": "dict", "default": {}, "schema": {
+				"enable": {"type": "boolean", "default": False},
+				"list": {"type": "list", "default": [], "schema": {"type": "string"}},
+			}},
+			"patch": {"type": "dict", "default": {}, "schema": {
+				"enable": {"type": "boolean", "default": False},
+				"path": {"type": "string", "default": ""},
+			}},
+			"seccomp": {"type": "dict", "default": {}, "schema": {
+				"enable": {"type": "boolean", "default": False},
+			}},
+			"yara": {"type": "dict", "default": {}, "schema": {
+				"enable": {"type": "boolean", "default": False},
+				"path": {"type": "string", "default": ""},
+			}},
+			"libc_source": {"type": "dict", "default": {}, "schema": {
+				"enable": {"type": "boolean", "default": False},
+			}},
+			"templates": {"type": "dict", "default": {}, "keysrules": {"type": "string"}, "valuesrules": {
+				"type": "dict", "schema": {
+					"path": {"type": "string", "default": ""},
+					"interactions": {"type": "boolean", "default": False},
+					"pwntube_variable": {"type": "string", "default": "io"},
+					"tab": {"type": "string", "default": "\t"},
+					"script_path": {"type": "string", "default": "solve_<exe_basename:>.py"},
+				},
+			}},
+			"commands": {"type": "list", "default": [], "schema": {"type": "string"}}
+		}
+
+		validator = cerberus.Validator(CONFIG_SCHEMA)
+		config = validator.normalized(config)
+		is_valid = validator(config)
+		if not is_valid:
+			log.error(f"Configuration not valid:\n{validator.errors}")
+
+		return config 
