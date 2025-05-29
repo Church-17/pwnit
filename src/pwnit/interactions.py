@@ -10,18 +10,8 @@ class Interactions:
 		self.functions: list[InteractionFunction] = []
 		self.menu_recvuntil: str = ""
 
-		# Try autodetect menu recvuntil
-		if exe.runnable_path:
-			with log_silent:
-				with process([str(exe.runnable_path)]) as tube:
-					self.menu_recvuntil = tube.recvrepeat(0.5).strip().split(b" ")[-1].split(b"\n")[-1].decode()
-		
-		# Menu recvuntil
-		if self.menu_recvuntil:
-			log.success(f"Menu recvuntil autodetected: \'{self.menu_recvuntil}\'")
-		else:
-			self.menu_recvuntil = ask("Menu recvuntil (empty to finish interactions)")
-			if not self.menu_recvuntil: return
+		self.menu_recvuntil = ask("Menu recvuntil (empty to finish interactions)")
+		if not self.menu_recvuntil: return
 
 		# Functions
 		while True:
