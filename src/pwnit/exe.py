@@ -125,24 +125,25 @@ class Exe(Binary):
 
 			# Run patchelf
 			progress.status("Run patchelf...")
-			cmd_args = ["patchelf", "--set-rpath", debug_dir]
+			prev_path = self.path
 			if loader_path:
 				loader_path.chmod(0o755)
-				cmd_args += ["--set-interpreter", loader_path]
-			cmd_args += ["--output", patch_path, self.path]
-			cmd_output = run_command(cmd_args, progress_log=progress)
+				cmd_output = run_command(["patchelf", "--set-interpreter", loader_path, "--output", patch_path, prev_path], progress_log=progress)
+				if cmd_output is None: return
+				prev_path = patch_path
+			cmd_output = run_command(["patchelf", "--set-rpath", debug_dir, "--output", patch_path, prev_path], progress_log=progress)
+			if cmd_output is None: return
 
 			# Change exe debug path
-			if cmd_output is not None:
-				self.debug_path = patch_path.resolve()
-				self.set_runnable_path(self.debug_path)
+			self.debug_path = patch_path.resolve()
+			self.set_runnable_path(self.debug_path)
 
-				# Warning about the relative runpath and the relative interpreter path
-				if debug_dir.is_relative_to("."):
-					if loader_path:
-						log.info("The patched exe can run only from this working directory")
-					else:
-						log.info("The patched exe can run with the fixed libs only from this working directory")
+			# Warning about the relative runpath and the relative interpreter path
+			if debug_dir.is_relative_to("."):
+				if loader_path:
+					log.info("The patched exe can run only from this working directory")
+				else:
+					log.info("The patched exe can run with the fixed libs only from this working directory")
 
 
 	def seccomp(self, timeout: float = 1) -> None:
