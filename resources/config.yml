@@ -15,14 +15,14 @@ seccomp:
 
 yara:
   enable: true
-  path: "/home/matte/.config/pwnit/findcrypt3.rules"
+  path: "~/.config/pwnit/findcrypt3.rules"
 
 libc_source:
   enable: false
 
 templates:
   default:
-    path: "/home/matte/backup/cyber/template/pwn_template.py"
+    path: "~/.config/pwnit/template.py"
     interactions: false
     pwntube_variable: "io"
     tab: "\t"
