@@ -1,10 +1,13 @@
 from pathlib import Path
+
 from pwnit.file_manage import handle_path, check_file, check_dir, download_file
 from pwnit.args import Args
 from pwnit.utils import log, choose
 
+
 CONFIG_DIRPATH: Path = handle_path("~/.config/pwnit/")
 CONFIG_FILEPATH = CONFIG_DIRPATH / "config.yml"
+
 
 class Config:
 	def __init__(self, args: Args) -> None:
@@ -12,16 +15,23 @@ class Config:
 		# Read and validate config
 		config: dict[str] = self.validate_config(self.read_config_file())
 
-		# Retrieve template to use
+		# Retrieve template to use:
+		# If a template is been specified in args
 		if args.template:
 			if args.template not in config["templates"]:
 				log.error("Speficied template isn't present in the configuration")
 			template = config["templates"][args.template]
+		
+		# Else if a default template is present
 		elif "default" in config["templates"]:
 			template = config["templates"]["default"]
+
+		# Else if there are some templates in config
 		elif config["templates"]:
 			log.warning("Default template isn't present in the configuration")
 			template = config["templates"][choose(list(config["templates"]), "Choose template to use:")]
+		
+		# Else no template
 		else:
 			template = {}
 		assert isinstance(template, dict)
@@ -72,6 +82,7 @@ class Config:
 		return config
 	
 	def validate_config(self, config: dict[str]) -> dict[str]:
+		"""Validate the schema of the config using cerberus"""
 		import cerberus
 
 		CONFIG_SCHEMA = {

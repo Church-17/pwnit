@@ -14,7 +14,8 @@ class Args:
 		self.seccomp: bool			= args["seccomp"]
 		self.yara: bool				= args["yara"]
 
-		if self.remote: assert re.search(r"^[^\:]+\:\d+$", self.remote), "Remote parameter without the correct syntax '<host>:<port>'"
+		if self.remote and not re.search(r"^[^\:]+\:\d+$", self.remote):
+			raise ValueError("Remote parameter without the correct syntax '<host>:<port>'")
 
 
 	def parse_args(self) -> dict[str]:
@@ -30,37 +31,32 @@ class Args:
 			help="Specify <host>:<port>",
 		)
 		parser.add_argument(
-			"-i", "--interactions",
+			"-i", "--interactions", action="store_true",
 			help="Create the interactions",
-			action="store_true",
 		)
 		parser.add_argument(
 			"-t", "--template",
 			help="Create the script from the template",
 		)
 		parser.add_argument(
-			"-o", "--only",
+			"-o", "--only", action="store_true",
 			help="Do only the actions specified in args",
-			action="store_true",
 		)
 		parser.add_argument(
-			"--libc-source",
+			"--libc-source", action="store_true",
 			help="Donwload the libc source",
-			action="store_true",
 		)
 		parser.add_argument(
-			"--patch",
+			"--patch", action="store_true",
 			help="Patch the executable with the specified path",
-			action="store_true",
 		)
 		parser.add_argument(
-			"--seccomp",
-			help="Check seccomp",
-			action="store_true",
+			"--seccomp", action="store_true",
+			help="Print seccomp rules if present",
 		)
 		parser.add_argument(
-			"--yara",
+			"--yara", action="store_true",
 			help="Check for given Yara rules",
-			action="store_true",
 		)
+
 		return parser.parse_args().__dict__

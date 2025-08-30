@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from pwnit.args import Args
 from pwnit.config import Config
 from pwnit.file_manage import recognize_exe, recognize_libs
@@ -37,16 +38,19 @@ def main():
 	# Do with exe
 	if exe:
 
-		# Describe
+		# Print some info
 		exe.describe()
 		exe.check_functions(config.check_functions)
 
 		# Patch
-		if config.patch_path: exe.patch(config.patch_path, libc)
+		if config.patch_path:
+			exe.patch(config.patch_path, libc)
 
 		# Analyze
-		if config.seccomp: exe.seccomp()
-		if config.yara_rules: exe.yara(config.yara_rules)
+		if config.seccomp:
+			exe.seccomp()
+		if config.yara_rules:
+			exe.yara(config.yara_rules)
 	
 		print()
 
@@ -55,7 +59,8 @@ def main():
 	if libc:
 
 		# Download libc source
-		if config.libc_source: libc.download_source()
+		if config.libc_source:
+			libc.download_source()
 
 		print()
 
@@ -64,7 +69,7 @@ def main():
 	if config.template_path:
 
 		# Interactions
-		interactions = Interactions(exe, config.pwntube_variable, config.tab) if config.interactions and exe else None
+		interactions = Interactions(config.pwntube_variable, config.tab) if config.interactions else None
 
 		# Create script
 		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)

@@ -11,27 +11,34 @@ from pwnit.binary import Binary
 class Libc(Binary):
 	def __init__(self, filepath: Path) -> None:
 		super().__init__(filepath)
-		self.source_path: Path | None = None
 
-		# Retrieve libc id
+		# Initialize variables
+		self.source_path: Path | None = None
+		self.libc_id: str | None = None
+		self.libc_version: str | None = None
+
+		# Retrieve libc_id
 		with log.progress("Libc version", "Retrieving libc ID from libc.rip...") as progress:
 			with log_silent:
 				libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
+
 			if libc_matches:
-				self.libc_id = libc_matches[0]['id']
+				self.libc_id: str = libc_matches[0]['id']
 
-				# Retrieve libc version
+				# Retrieve libc version from libc_id
+				progress.status("Retrieving libc version from libc_id...")
 				match = re.search(r"\d+(?:\.\d+)+", self.libc_id)
-				assert match
-				self.libc_version = match.group()
+				if match:
+					self.libc_version = match.group()
 
-			else:
-				self.libc_id = None
-				progress.status("Failed to retrieve libc ID from libc.rip, retrieving version from file...")
+			if not self.libc_version:
+				if not self.libc_id:
+					log.failure("Failed to retrieve libc_id from libc.rip")
 				if libc_matches == []:
-					log.warning(f"Recognized libc is not a standard libc")
+					log.warning("Recognized libc is not a standard libc")
 
 				# Retrieve libc version
+				progress.status("Retrieving libc version from file...")
 				match = re.search(br"release version (\d+(?:\.\d+)+)", self.path.read_bytes())
 				if match:
 					self.libc_version = match.group(1).decode()
@@ -44,7 +51,7 @@ class Libc(Binary):
 				progress.success(f"{self.libc_version}" + (f" ({self.libc_id})" if self.libc_id else ""))
 
 		# Download libs
-		with log.progress("Retrieve libs", "Downloading...") as progress:
+		with log.progress("Retrieve associated libs", "Downloading...") as progress:
 			with log_silent:
 				try:
 					self.libs_path = handle_path(libcdb.download_libraries(self.path))
@@ -59,7 +66,7 @@ class Libc(Binary):
 	def download_source(self) -> None:
 		"""Download the source code of this libc version"""
 
-		with log.progress("Libc source") as progress:
+		with log.progress("Download libc source code") as progress:
 
 			# Check numeric libc version
 			if not self.libc_version:

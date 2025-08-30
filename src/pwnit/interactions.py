@@ -1,10 +1,8 @@
-from pwn import process
-from pwnit.utils import log, log_silent, ask
-from pwnit.exe import Exe
+from pwnit.utils import ask
 
 
 class Interactions:
-	def __init__(self, exe: Exe, pwntube_variable: str, tab: str):
+	def __init__(self, pwntube_variable: str, tab: str):
 		self.pwntube_variable: str = pwntube_variable
 		self.tab: str = tab
 		self.functions: list[InteractionFunction] = []

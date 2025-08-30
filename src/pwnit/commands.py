@@ -1,21 +1,27 @@
 from pwnlib.term.text import blue
+
 from pwnit.utils import log, run_command
 from pwnit.exe import Exe
 from pwnit.libc import Libc
 from pwnit.placeholders import replace_placeholders
+
 
 def run_custom_commands(
 		commands: list[str],
 		exe: Exe | None,
 		libc: Libc | None,
 		remote: str,
-	):
+	) -> None:
 
+	# For each command to execute...
 	for cmd in commands:
 
-		# Handle placeholders in commands (skip if a placeholder can't be substitute)
+		# Handle placeholders in command
 		new_cmd = replace_placeholders(cmd, exe, libc, remote, keep_missing=False)
-		if not new_cmd: continue
+
+		# Skip command execution if some placeholder is not been substituted
+		if not new_cmd:
+			continue
 
 		# Run command
 		with log.progress(f"$ {blue(new_cmd)} ") as progress:

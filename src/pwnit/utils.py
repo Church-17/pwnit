@@ -21,8 +21,15 @@ def choose(opts: list[ElementT], prompt: str = "Choose:", default: int | None = 
 	return opts[options(f"\r [{yellow('?')}] {prompt}", list(map(str, opts)), default)]
 
 
-def run_command(args: list | str, progress_log: Progress | Logger | None = log, **kwargs) -> str | None:
-	"""Run a command, logging out failures msg in the progress or in the log"""
+def run_command(
+		args: list | str,
+		progress_log: Progress | Logger | None = log,
+		**kwargs,
+	) -> str | None:
+	"""
+	Run a command, logging out failures messages in the progress or in the log.
+	This function returns the output of the command, `None` on error, and `""` on timeout.
+	"""
 	
 	assert args
 	cmd = args.split(" ")[0] if isinstance(args, str) else args[0]

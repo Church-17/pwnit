@@ -1,4 +1,5 @@
 import re
+
 from pwnit.file_manage import relative_path
 from pwnit.exe import Exe
 from pwnit.libc import Libc
@@ -44,7 +45,7 @@ def replace_placeholders(
 	interactions_matches = re.finditer(r"([ \t]*?)(?:#.*?)?<interactions(:.*?)?>", text)
 
 	# Define error when a placeholder is cannot be substituted
-	class SubstitutionError(Exception): ...
+	class SubstitutionError(Exception): pass
 
 	# Define the substitution function
 	def substitute(re_match: re.Match) -> str:
@@ -64,10 +65,12 @@ def replace_placeholders(
 				return substitutions[placeholder]
 
 			# If there is an integrated default, use it
-			elif re_match.group(2): return re_match.group(2)[1:]
+			elif re_match.group(2):
+				return re_match.group(2)[1:]
 
 			# If the missing can't be kept, raise an error to stop the substitutions
-			elif not keep_missing: raise SubstitutionError
+			elif not keep_missing:
+				raise SubstitutionError
 		
 		# If the found regex is not a correct placeholder, or the missing can be kept, don't do anything
 		return re_match.group(0)

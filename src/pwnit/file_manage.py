@@ -17,11 +17,13 @@ def recognize_exe(path_list: Iterable[Path]) -> Path | None:
 
 		# Execute file command
 		filecmd_output = run_command(["file", "-bL", file], timeout=1)
-		if not filecmd_output: continue
+		if not filecmd_output:
+			continue
 
 		# Search executable regex
 		match = re.search(r"^ELF [^\,]+ executable", filecmd_output)
-		if not match: continue
+		if not match:
+			continue
 
 		possible_exes.append(file)
 
@@ -41,7 +43,8 @@ def recognize_libs(path_list: Iterable[Path], libs_names: Iterable[str] = set())
 
 		# Search libs regex
 		match = re.search(rf"^({search_for})(?:[^A-Za-z].*)?\.so", file.name)
-		if not match: continue
+		if not match:
+			continue
 
 		# Append file to possible libs
 		lib_name = match.group(1)
@@ -79,7 +82,7 @@ def check_dir(path: Path) -> bool:
 
 
 def fix_if_exist(path: Path) -> Path:
-	"""Check if debug dir exists, in case ask for a new name"""
+	"""Check if a path exists, in case ask for a new name"""
 
 	while path.exists():
 		new_name = ask(f"{path} already exists: type another path (empty to overwrite)")
@@ -98,8 +101,7 @@ def download_file(filepath: Path, url: str) -> None:
 	if not check_file(filepath):
 		try:
 			response = requests.get(url)
-			if response:
+			if response.ok:
 				filepath.write_text(response.text)
 		except:
 			pass
-
