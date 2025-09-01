@@ -28,14 +28,14 @@ class Exe(Binary):
 				self.statically_linked = True
 			else:
 				self.statically_linked = False
-				libs_paths = {line.strip().split(" ", 1)[0] for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
+				libs_paths = {Path(line.strip().split(" ", 1)[0]) for line in ldd_output.split("\n") if line and ("linux-vdso" not in line)}
 		elif not self.statically_linked:
 			try:
-				libs_paths = {lib for lib in self.libs if lib != self.path}
+				libs_paths = {Path(lib) for lib in self.libs if Path(lib) != self.path}
 			except:
 				log.failure("Impossible to retrieve the libs requested by the executable")
 
-		self.required_libs: dict[str, Path] = recognize_libs({Path(Path(lib).name) for lib in libs_paths})
+		self.required_libs: dict[str, Path] = recognize_libs({Path(lib.name) for lib in libs_paths})
 
 
 	def set_runnable_path(self, path: Path) -> None:
@@ -114,11 +114,13 @@ class Exe(Binary):
 
 			# Copy the libs from cwd
 			for lib, file in recognize_libs(Path(".").iterdir(), missing_libs.keys()).items():
+
+				# Move to debug dir, changing name as the exe expects
 				new_path = debug_dir / missing_libs[lib]
 				shutil.copy2(file, new_path)
 				missing_libs.pop(lib)
 
-				# Handle specific lib
+				# Handle loader
 				if lib == "ld":
 					loader_path = new_path
 
@@ -127,10 +129,12 @@ class Exe(Binary):
 				libs_set = {Path(lib.name) for lib in libc.libs_path.iterdir()}
 				for lib, file in missing_libs.copy().items():
 					if file in libs_set:
+
+						# Move to debug dir
 						shutil.copy2(libc.libs_path / file, debug_dir)
 						missing_libs.pop(lib)
 
-						# Handle specific lib
+						# Handle loader
 						if lib == "ld":
 							loader_path = debug_dir / file
 				
