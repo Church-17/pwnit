@@ -7,7 +7,7 @@ from pwnit.utils import ask, choose, run_command
 
 
 def recognize_exe(path_list: Iterable[Path]) -> Path | None:
-	"""Recognize the executable from a list of files"""
+	"""Recognize the executable from a list of paths"""
 
 	# Initialize potential executables list
 	possible_exes: list[Path] = []
@@ -32,11 +32,15 @@ def recognize_exe(path_list: Iterable[Path]) -> Path | None:
 
 
 def recognize_libs(path_list: Iterable[Path], libs_names: Iterable[str] = set()) -> dict[str, Path]:
-	"""Recognize the libs from a list of files, filtering for some of them"""
+	"""
+	Recognize the libs from a list of paths,
+	returning a dict of common names and the related path of that lib.
+	It is possible to filter for common names.
+	"""
 
 	# Initialize potential libraries lists
 	possible_libs: dict[str, list[Path]] = {}
-	search_for = r'|'.join(libs_names) if libs_names else r"[A-Za-z]+"
+	search_for = r"|".join(libs_names) if libs_names else r"[A-Za-z]+"
 
 	# Loop through path
 	for file in path_list:

@@ -44,13 +44,13 @@ class Exe(Binary):
 		# Return if the runnable path is been already found
 		if self.runnable_path:
 			return
-		
+
 		# Check if path is runnable without errors
 		with log_silent:
 			check_error = run_command([path], timeout=0.5)
 		if check_error is None:
 			return
-		
+
 		# Set runnable path
 		self.runnable_path = path
 
