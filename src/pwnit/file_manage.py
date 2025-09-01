@@ -52,10 +52,7 @@ def recognize_libs(path_list: Iterable[Path], libs_names: Iterable[str] = set())
 
 		# Append file to possible libs
 		lib_name = match.group(1)
-		if not lib_name in possible_libs:
-			possible_libs[lib_name] = [file]
-		else:
-			possible_libs[lib_name].append(file)
+		possible_libs[lib_name] = possible_libs.get(lib_name, []) + [file]
 
 	# Select actual libs and return them
 	return {lib_name: choose(opts, f"Select {lib_name}:") for lib_name, opts in possible_libs.items()}
