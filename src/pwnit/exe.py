@@ -76,8 +76,8 @@ class Exe(Binary):
 	def patch(self, patch_path: Path, libc: Libc | None) -> None:
 		"""Patch the executable with the given libc"""
 
-		# Return if statically linked or already patched
-		if self.statically_linked or self.runpath:
+		# Return if statically linked
+		if self.statically_linked:
 			return
 
 		with log.progress("Patch") as progress:
