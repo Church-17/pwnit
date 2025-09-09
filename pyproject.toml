@@ -3,9 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-dynamic = ["version"]
-
 name = "pwnit"
+version = "0.6.0"
 description = "Automatic tool to quickly start a pwn CTF challenge"
 authors = [
 	{name="Matteo Chiesa", email="matteo.chiesa.mc@gmail.com"}
@@ -42,6 +41,3 @@ Homepage = "https://github.com/Church-17/pwnit"
 
 [project.scripts]
 pwnit = "pwnit.main:main"
-
-[tool.hatch.version]
-path = "src/pwnit/__init__.py"
