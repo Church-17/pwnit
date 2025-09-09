@@ -23,11 +23,18 @@ def main():
 		exe = Exe(exe_path)
 	else:
 		exe = None
-		log.warning("Exe: not found")
+		log.warning("Exe not found")
 
 	# Recognize libc
 	if (not exe) or ("libc" in exe.required_libs):
-		libcs = recognize_libs(Path(exe.runpath.decode() if (exe and exe.runpath) else ".").iterdir(), ["libc"])
+		if exe and exe.runpath:
+			libs_path = Path(exe.runpath.decode())
+			if not libs_path.is_dir():
+				log.warning("The runpath of the exe is not a directory; fallback to the cwd")
+				libs_path = Path(".")
+		else:
+			libs_path = Path(".")
+		libcs = recognize_libs(libs_path.iterdir(), {"libc"})
 		libc = Libc(libcs["libc"]) if ("libc" in libcs) else None
 	else:
 		libc = None
