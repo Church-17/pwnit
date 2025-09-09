@@ -69,7 +69,7 @@ def relative_path(path: Path) -> Path:
 def check_file(path: Path) -> bool:
 	if not path.is_file():
 		if path.exists():
-			raise FileExistsError(f"{path} exists but it's not a regular file")
+			raise FileExistsError(f"{path} expected to be a regular file")
 		return False
 	return True
 
@@ -77,7 +77,7 @@ def check_file(path: Path) -> bool:
 def check_dir(path: Path) -> bool:
 	if not path.is_dir():
 		if path.exists():
-			raise FileExistsError(f"{path} exists but it's not a directory")
+			raise FileExistsError(f"{path} expected to be a directory")
 		return False
 	return True
 
