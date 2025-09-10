@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from pwnit.file_manage import handle_path, check_file, check_dir, download_file
-from pwnit.args import Args
+from pwnit.config.args import Args
 from pwnit.utils import log, choose
 
 
@@ -10,7 +10,10 @@ CONFIG_FILEPATH = CONFIG_DIRPATH / "config.yml"
 
 
 class Config:
-	def __init__(self, args: Args) -> None:
+	def __init__(self) -> None:
+
+		# Parse args
+		args = Args()
 
 		# Read and validate config
 		config: dict[str] = self.validate_config(self.read_config_file())
@@ -34,6 +37,7 @@ class Config:
 		assert isinstance(template, dict)
 
 		# Set config variables
+		self.remote: str | None			= args.remote
 		self.check_functions: list[str] = config.get("check_functions", [])
 		self.patch_path: Path | None	= handle_path(args.patch or config.get("patch", None))
 		self.seccomp: bool				= args.seccomp or config.get("seccomp", False)
@@ -85,13 +89,13 @@ class Config:
 		import json
 		import jsonschema
 
-		with resources.open_text('pwnit.schemas', 'config.schema.json') as f:
+		with resources.open_text('pwnit.config', 'config.schema.json') as f:
 			schema = json.load(f)
 
 		try:
 			jsonschema.validate(config, schema)
-		except Exception as err:
-			log.failure(f"Invalid config: {err}")
+		except jsonschema.ValidationError as err:
+			log.failure(f"Invalid config: {err.message}")
 			exit()
 
 		return config

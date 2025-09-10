@@ -1,7 +1,6 @@
 from pathlib import Path
 
-from pwnit.args import Args
-from pwnit.config import Config
+from pwnit.config.config import Config
 from pwnit.file_manage import recognize_exe, recognize_libs
 from pwnit.exe import Exe
 from pwnit.libc import Libc
@@ -13,8 +12,7 @@ from pwnit.utils import log
 def main():
 
 	# Parse args and config
-	args = Args()
-	config = Config(args)
+	config = Config()
 
 
 	# Recognize exe
@@ -77,10 +75,10 @@ def main():
 		interactions = Interactions(config.pwntube_variable, config.tab) if config.interactions else None
 
 		# Create script
-		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
+		create_script(config.template_path, config.script_path, config.remote, exe, libc, interactions)
 
 		print()
 
 
 	# Run custom commands
-	run_custom_commands(config.commands, exe, libc, args.remote)
+	run_custom_commands(config.commands, exe, libc, config.remote)
