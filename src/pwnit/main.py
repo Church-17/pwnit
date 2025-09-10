@@ -73,13 +73,16 @@ def main():
 
 
 	# Do with template
-	if config.template_path:
+	if config.template:
 
 		# Interactions
-		interactions = Interactions(config.pwntube_variable, config.tab) if config.interactions else None
+		if config.template["interactions"]:
+			interactions = Interactions(config.template["pwntube_variable"], config.template["tab"])
+		else:
+			interactions = None
 
 		# Create script
-		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
+		create_script(config.template["path"], config.template["script_path"], args.remote, exe, libc, interactions)
 
 		print()
 

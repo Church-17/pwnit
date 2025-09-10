@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pwnit"
-version = "0.6.2"
+version = "0.7.0"
 description = "Automatic tool to quickly start a pwn CTF challenge"
 authors = [
 	{name="Matteo Chiesa", email="matteo.chiesa.mc@gmail.com"}
@@ -19,7 +19,7 @@ license = {file = "LICENSE"}
 requires-python = ">=3.10"
 dependencies = [
 	"pyyaml",
-	"cerberus",
+	"jsonschema",
 	"requests",
 	"pwntools",
 	"yara-python",
@@ -41,3 +41,6 @@ Homepage = "https://github.com/Church-17/pwnit"
 
 [project.scripts]
 pwnit = "pwnit.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pwnit"]
