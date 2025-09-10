@@ -1,3 +1,4 @@
+from pathlib import Path
 import re
 
 class Args:
@@ -10,9 +11,9 @@ class Args:
 		self.template: str | None	= args["template"]
 		self.only: bool				= args["only"]
 		self.libc_source: bool		= args["libc_source"]
-		self.patch: bool			= args["patch"]
+		self.patch: Path | None		= args["patch"]
 		self.seccomp: bool			= args["seccomp"]
-		self.yara: bool				= args["yara"]
+		self.yara: Path | None		= args["yara"]
 
 		if self.remote and not re.search(r"^[^\:]+\:\d+$", self.remote):
 			raise ValueError("Remote parameter without the correct syntax '<host>:<port>'")
@@ -27,27 +28,23 @@ class Args:
 			description="pwnit is a tool to quickly start a pwn challenge",
 		)
 		parser.add_argument(
-			"-r", "--remote",
+			"-r", "--remote", type=str, default=None, metavar="HOST:PORT",
 			help="Specify <host>:<port>",
-		)
-		parser.add_argument(
-			"-i", "--interactions", action="store_true",
-			help="Create the interactions",
-		)
-		parser.add_argument(
-			"-t", "--template",
-			help="Create the script from the template",
 		)
 		parser.add_argument(
 			"-o", "--only", action="store_true",
 			help="Do only the actions specified in args",
 		)
 		parser.add_argument(
-			"--libc-source", action="store_true",
-			help="Donwload the libc source",
+			"-i", "--interactions", action="store_true",
+			help="Create the interactions",
 		)
 		parser.add_argument(
-			"--patch", action="store_true",
+			"-t", "--template", type=str, default=None, metavar="TAG",
+			help="Create the script from the template",
+		)
+		parser.add_argument(
+			"-p", "--patch", type=Path, default=None, metavar="PATH",
 			help="Patch the executable with the specified path",
 		)
 		parser.add_argument(
@@ -55,8 +52,12 @@ class Args:
 			help="Print seccomp rules if present",
 		)
 		parser.add_argument(
-			"--yara", action="store_true",
-			help="Check for given Yara rules",
+			"--yara", type=Path, default=None, metavar="RULES_FILEPATH",
+			help="Check for given Yara rules file",
+		)
+		parser.add_argument(
+			"--libc-source", action="store_true",
+			help="Donwload the libc source",
 		)
 
 		return parser.parse_args().__dict__
