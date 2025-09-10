@@ -89,8 +89,10 @@ class Exe(Binary):
 
 			# Create debug dir
 			progress.status("Creating debug directory...")
-			debug_dir = fix_if_exist(patch_path.parent)
-			debug_dir.mkdir(parents=True)
+			debug_dir = patch_path.parent
+			if debug_dir != Path("."):
+				debug_dir = fix_if_exist(patch_path.parent)
+				debug_dir.mkdir(parents=True)
 			patch_path = debug_dir / patch_path.name
 
 
