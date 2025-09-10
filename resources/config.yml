@@ -1,24 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Church-17/pwnit/master/src/pwnit/schemas/config.schema.json
 check_functions:
-  enable: true
-  list:
-    - "system"
-    - "gets"
-    - "ptrace"
-    - "execve"
+  - "system"
+  - "gets"
+  - "ptrace"
+  - "execve"
 
-patch:
-  enable: true
-  path: "./debug/<exe_basename>_patched"
+patch: "./debug/<exe_basename>_patched"
 
-seccomp:
-  enable: true
+seccomp: true
 
-yara:
-  enable: true
-  path: "~/.config/pwnit/findcrypt3.rules"
+yara: "~/.config/pwnit/findcrypt3.rules"
 
-libc_source:
-  enable: false
+libc_source: false
 
 templates:
   default:
