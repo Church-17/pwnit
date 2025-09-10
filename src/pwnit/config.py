@@ -33,16 +33,17 @@ class Config:
 			template = templates[choose(list(templates), "Choose template to use:")]
 		assert isinstance(template, dict)
 
-		if template and args.interactions:
-			template["interactions"] = True
-
 		# Set config variables
 		self.check_functions: list[str] = config.get("check_functions", [])
 		self.patch_path: Path | None	= handle_path(args.patch or config.get("patch", None))
 		self.seccomp: bool				= args.seccomp or config.get("seccomp", False)
 		self.yara_rules: Path | None	= handle_path(args.yara or config.get("yara", None))
 		self.libc_source: bool			= args.libc_source or config.get("libc_source", False)
-		self.template: dict				= template
+		self.template_path: Path | None	= handle_path(template.get("path", None))
+		self.interactions: bool			= args.interactions or template.get("interactions", False)
+		self.pwntube_variable: str		= template.get("pwntube_variable", "io")
+		self.tab: str					= template.get("tab", "\t")
+		self.script_path: Path			= handle_path(template.get("script_path", "solve_<exe_basename:>.py"))
 		self.commands: list[str]		= config.get("commands", [])
 
 		# Handle only mode
@@ -51,11 +52,8 @@ class Config:
 			if not args.seccomp: self.seccomp = False
 			if not args.yara: self.yara_rules = None
 			if not args.libc_source: self.libc_source = False
-			if not args.interactions:
-				if not args.template:
-					self.template = {}
-				else:
-					self.template["interactions"] = False
+			if not args.interactions and not args.template: self.template_path = None
+			if not args.interactions: self.interactions = False
 			self.commands = []
 
 

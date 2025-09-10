@@ -27,13 +27,11 @@ def main():
 
 	# Recognize libc
 	if (not exe) or ("libc" in exe.required_libs):
+		libs_path = Path(".")
 		if exe and exe.runpath:
 			libs_path = Path(exe.runpath.decode())
 			if not libs_path.is_dir():
 				log.warning("The runpath of the exe is not a directory; fallback to the cwd")
-				libs_path = Path(".")
-		else:
-			libs_path = Path(".")
 		libcs = recognize_libs(libs_path.iterdir(), {"libc"})
 		libc = Libc(libcs["libc"]) if ("libc" in libcs) else None
 	else:
@@ -73,16 +71,13 @@ def main():
 
 
 	# Do with template
-	if config.template:
+	if config.template_path:
 
 		# Interactions
-		if config.template["interactions"]:
-			interactions = Interactions(config.template["pwntube_variable"], config.template["tab"])
-		else:
-			interactions = None
+		interactions = Interactions(config.pwntube_variable, config.tab) if config.interactions else None
 
 		# Create script
-		create_script(config.template["path"], config.template["script_path"], args.remote, exe, libc, interactions)
+		create_script(config.template_path, config.script_path, args.remote, exe, libc, interactions)
 
 		print()
 
