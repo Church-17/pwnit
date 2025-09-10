@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/Church-17/pwnit/master/resources/schema.json",
+  "title": "PwnIt Configuration",
+  "type": "object",
+  "properties": {
+    "check_functions": {
+      "description": "Function names to check if they are in the executable",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "patch": {
+      "description": "Path of the produced patched executable",
+      "type": ["string", "null"]
+    },
+    "seccomp": {
+      "description": "Enable the seccomp analysis",
+      "type": ["boolean", "null"]
+    },
+    "yara": {
+      "description": "Path of the Yara rules file to use to analyze the executable with",
+      "type": ["string", "null"]
+    },
+    "libc_source": {
+      "description": "Path where to download the libc source code",
+      "type": ["string", "null"]
+    },
+    "templates": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" },
+            "interactions": { "type": "boolean" },
+            "pwntube_variable": { "type": "string" },
+            "tab": { "type": "string" },
+            "script_path": { "type": "string" }
+          },
+          "required": ["path", "interactions", "pwntube_variable", "tab", "script_path"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "commands": {
+      "description": "List of commands to run",
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
