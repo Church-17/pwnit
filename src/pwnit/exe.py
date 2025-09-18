@@ -105,7 +105,8 @@ class Exe(Binary):
 			# Copy and unstrip libc
 			if libc:
 				new_path = debug_dir / missing_libs["libc"]
-				shutil.copy2(libc.path, new_path)
+				if libc.path.resolve() != new_path.resolve():
+					shutil.copy2(libc.path, new_path)
 				missing_libs.pop("libc")
 				with log_silent:
 					try:
@@ -119,7 +120,8 @@ class Exe(Binary):
 
 				# Move to debug dir, changing name as the exe expects
 				new_path = debug_dir / missing_libs[lib]
-				shutil.copy2(file, new_path)
+				if file.resolve() != new_path.resolve():
+					shutil.copy2(file, new_path)
 				missing_libs.pop(lib)
 
 				# Handle loader
