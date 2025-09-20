@@ -5,7 +5,7 @@
 	"type": "object",
 	"properties": {
 		"check_functions": {
-			"description": "Function names to check if they are in the executable",
+			"description": "List of function names to check if they are in the executable",
 			"type": "array",
 			"items": { "type": "string" }
 		},
@@ -22,7 +22,7 @@
 			"type": ["string", "null"]
 		},
 		"libc_source": {
-			"description": "Path where to download the libc source code",
+			"description": "Enable the download the libc source code",
 			"type": "boolean"
 		},
 		"templates": {
