@@ -19,22 +19,24 @@ This repository started as a fork of [spwn](https://github.com/MarcoMeinardi/spw
 
 ## Usage
 ```
-usage: pwnit [-h] [-r REMOTE] [-i] [-t TEMPLATE] [-o] [--libc-source] [--patch] [--seccomp] [--yara]
+usage: pwnit [-h] [-r HOST:PORT] [-o] [-i] [-t TAG] [-p PATH] [--seccomp] [--yara RULES_FILEPATH] [--libc-source]
 
 pwnit is a tool to quickly start a pwn challenge
 
 options:
   -h, --help            show this help message and exit
-  -r REMOTE, --remote REMOTE
+  -r HOST:PORT, --remote HOST:PORT
                         Specify <host>:<port>
-  -i, --interactions    Create the interactions
-  -t TEMPLATE, --template TEMPLATE
-                        Create the script from the template
   -o, --only            Do only the actions specified in args
+  -i, --interactions    Create the interactions
+  -t TAG, --template TAG
+                        Create the script from the template
+  -p PATH, --patch PATH
+                        Patch the executable with the specified path
+  --seccomp             Print seccomp rules if present
+  --yara RULES_FILEPATH
+                        Check for given Yara rules file
   --libc-source         Donwload the libc source
-  --patch               Patch the executable with the specified path
-  --seccomp             Check seccomp
-  --yara                Check for given Yara rules
 ```
 
 If the files have weird names (such as the libc name not starting with `libc`), the autodetection will fail; the best fix for this is to rename the files.
