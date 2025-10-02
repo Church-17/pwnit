@@ -27,10 +27,10 @@ dependencies = [
 
 keywords = ["pwn", "ctf"]
 classifiers = [
+	"Development Status :: 4 - Beta",
 	"Environment :: Console",
-	"Development Status :: 2 - Pre-Alpha",
-	"License :: OSI Approved :: MIT License",
 	"Intended Audience :: Developers",
+	"License :: OSI Approved :: MIT License",
 	"Operating System :: POSIX :: Linux",
 	"Programming Language :: Python",
 	"Programming Language :: Python :: 3",
