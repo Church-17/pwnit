@@ -43,4 +43,4 @@ Homepage = "https://github.com/Church-17/pwnit"
 pwnit = "pwnit.main:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pwnit"]
+packages = ["pwnit"]
