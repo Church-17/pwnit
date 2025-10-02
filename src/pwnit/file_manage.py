@@ -86,7 +86,7 @@ def fix_if_exist(path: Path) -> Path:
 	"""Check if a path exists, in case ask for a new name"""
 
 	while path.exists():
-		new_name = ask(f"{path} already exists: type another path (empty to overwrite)")
+		new_name = ask(f"'{path}' already exists: type another path (empty to overwrite)")
 		if new_name:
 			path = Path(new_name)
 		else:

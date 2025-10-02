@@ -3,7 +3,7 @@ import shutil
 from pwn import libcdb
 from pwnlib.term.text import red, yellow, green
 
-from pwnit.utils import log, log_silent, run_command
+from pwnit.utils import log, log_silent, choose, run_command
 from pwnit.file_manage import recognize_libs, fix_if_exist
 from pwnit.binary import Binary
 from pwnit.libc import Libc
@@ -93,8 +93,9 @@ class Exe(Binary):
 			if debug_dir != Path("."):
 				debug_dir = fix_if_exist(patch_path.parent)
 				debug_dir.mkdir(parents=True)
+			elif choose(["Yes", "No"], "The debug directory is '.', this can override some files. Continue?", default=0) == "No":
+				return
 			patch_path = debug_dir / patch_path.name
-
 
 			progress.status("Copying and unstripping libs...")
 
