@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Church-17/pwnit/master/pwnit/resources/config.schema.json
+
 check_functions:
   - "system"
   - "gets"
