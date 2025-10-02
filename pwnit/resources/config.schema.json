@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://raw.githubusercontent.com/Church-17/pwnit/master/src/pwnit/schemas/config.schema.json",
+	"$id": "https://raw.githubusercontent.com/Church-17/pwnit/master/pwnit/resources/config.schema.json",
 	"title": "PwnIt Configuration",
 	"type": "object",
 	"properties": {

@@ -3,8 +3,8 @@ import re
 import tarfile
 import requests
 from pwn import libcdb
-from pwnit.utils import log, log_silent
-from pwnit.file_manage import handle_path, check_dir
+from pwnit.utils import log, log_silent, connection
+from pwnit.file_manage import handle_path, check_dir, download_file
 from pwnit.binary import Binary
 
 
@@ -16,11 +16,15 @@ class Libc(Binary):
 		self.source_path: Path | None = None
 		self.libc_id: str | None = None
 		self.libc_version: str | None = None
+		self.libs_path = None
 
 		# Retrieve libc_id
 		with log.progress("Libc version", "Retrieving libc ID from libc.rip...") as progress:
-			with log_silent:
-				libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
+			if connection:
+				with log_silent:
+					libc_matches = libcdb.query_libc_rip({'buildid': self.buildid.hex()})
+			else:
+				libc_matches = None
 
 			if libc_matches:
 				self.libc_id: str = libc_matches[0]['id']
@@ -32,8 +36,6 @@ class Libc(Binary):
 					self.libc_version = match.group()
 
 			if not self.libc_version:
-				if not self.libc_id:
-					log.failure("Failed to retrieve libc_id from libc.rip")
 				if libc_matches == []:
 					log.warning("Recognized libc is not a standard libc")
 
@@ -56,7 +58,7 @@ class Libc(Binary):
 				try:
 					self.libs_path = handle_path(libcdb.download_libraries(self.path))
 				except requests.RequestException:
-					self.libs_path = None
+					pass
 			if self.libs_path:
 				progress.success(f"Done ({self.libs_path})")
 			else:
@@ -87,16 +89,12 @@ class Libc(Binary):
 			else:
 				# Get libc source archive
 				url = f"http://ftpmirror.gnu.org/gnu/libc/{source_dirname}.tar.gz"
-				progress.status(f"Downloading from {url}...")
-				try:
-					response = requests.get(url)
-				except requests.RequestException:
-					response = None
-				if not response:
-					progress.failure(f"Download from {url} failed")
-					return None
 				archive_path = Path(f"/tmp/{source_dirname}.tar.gz")
-				archive_path.write_bytes(response.content)
+				progress.status(f"Downloading from {url}...")
+				download_file(archive_path, url)
+				if not archive_path.is_file():
+					progress.failure(f"Download from {url} failed")
+					return
 
 				# Extract archive
 				progress.status("Extracting...")

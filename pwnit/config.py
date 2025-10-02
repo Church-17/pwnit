@@ -1,7 +1,8 @@
+from importlib import resources
 from pathlib import Path
 
 from pwnit.file_manage import handle_path, check_file, check_dir, download_file
-from pwnit.config.args import Args
+from pwnit.args import Args
 from pwnit.utils import log, choose
 
 
@@ -72,24 +73,24 @@ class Config:
 				CONFIG_DIRPATH.mkdir()
 
 			# Try to download missing config files
-			download_file(handle_path(CONFIG_FILEPATH), "https://raw.githubusercontent.com/Church-17/pwnit/master/resources/config.yml")
-			download_file(handle_path(CONFIG_DIRPATH / "findcrypt3.rules"), "https://raw.githubusercontent.com/polymorf/findcrypt-yara/master/findcrypt3.rules")
-			download_file(handle_path(CONFIG_DIRPATH / "template.py"), "https://raw.githubusercontent.com/Church-17/pwnit/master/resources/template.py")
+			CONFIG_FILEPATH.write_text(resources.read_text('pwnit.resources', 'config.yml'))
+			(CONFIG_DIRPATH / "template.py").write_text(resources.read_text('pwnit.resources', 'template.py'))
+			download_file(CONFIG_DIRPATH / "findcrypt3.rules", "https://raw.githubusercontent.com/polymorf/findcrypt-yara/master/findcrypt3.rules")
 
 		# Parse config file
 		with open(CONFIG_FILEPATH, "r") as config_file:
 			config = yaml.safe_load(config_file)
 
 		return config
-	
+
+
 	def validate_config(self, config: dict[str]) -> dict[str]:
 		"""Validate the schema of the config using cerberus"""
 
-		from importlib import resources
 		import json
 		import jsonschema
 
-		with resources.open_text('pwnit.config', 'config.schema.json') as f:
+		with resources.open_text('pwnit.resources', 'config.schema.json') as f:
 			schema = json.load(f)
 
 		try:

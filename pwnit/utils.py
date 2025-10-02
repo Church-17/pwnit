@@ -1,5 +1,6 @@
 from typing import TypeVar
 import subprocess
+import socket
 from pwn import log, context, options
 from pwnlib.log import Progress, Logger
 from pwnlib.term.text import yellow
@@ -61,3 +62,14 @@ def run_command(
 		return ""
 
 	return None
+
+
+def check_internet():
+	try:
+		socket.create_connection(("8.8.8.8", 53), timeout=3)
+		return True
+	except:
+		log.warning("Missing internet")
+		return False
+
+connection = check_internet()

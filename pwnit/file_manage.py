@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 import shutil
 import requests
-from pwnit.utils import ask, choose, run_command
+from pwnit.utils import connection, ask, choose, run_command
 
 
 def recognize_exe(path_list: Iterable[Path]) -> Path | None:
@@ -99,10 +99,10 @@ def fix_if_exist(path: Path) -> Path:
 
 
 def download_file(filepath: Path, url: str) -> None:
-	if not check_file(filepath):
+	if connection and not check_file(filepath):
 		try:
 			response = requests.get(url)
 			if response.ok:
-				filepath.write_text(response.text)
-		except:
+				filepath.write_bytes(response.content)
+		except requests.RequestException:
 			pass

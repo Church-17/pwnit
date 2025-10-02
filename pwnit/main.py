@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pwnit.config.config import Config
+from pwnit.config import Config
 from pwnit.file_manage import recognize_exe, recognize_libs
 from pwnit.exe import Exe
 from pwnit.libc import Libc
