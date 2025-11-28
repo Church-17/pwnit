@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pwnit"
-version = "0.7.5"
+version = "0.7.6"
 description = "Automatic tool to quickly start a pwn CTF challenge"
 authors = [
 	{name="Matteo Chiesa", email="matteo.chiesa.mc@gmail.com"}
@@ -43,4 +43,4 @@ Homepage = "https://github.com/Church-17/pwnit"
 pwnit = "pwnit.main:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["pwnit"]
+packages = ["src/pwnit"]

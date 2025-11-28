@@ -60,7 +60,7 @@ def replace_placeholders(
 				# Handle tabs before interactions tag
 				if placeholder == "interactions":
 					nonlocal interactions_matches
-					return interactions.dump(next(interactions_matches).group(1))
+					return re_match.group(0) + interactions.dump(next(interactions_matches).group(1))
 					
 				return substitutions[placeholder]
 
