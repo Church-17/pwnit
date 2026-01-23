@@ -98,7 +98,7 @@ class Libc(Binary):
 
 				# Extract archive
 				progress.status("Extracting...")
-				with tarfile.open(archive_path, "r:gz") as tar:
+				with tarfile.open(archive_path) as tar:
 					tar.extractall(cache_dir)
 
 			# Return libc source
